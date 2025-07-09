@@ -11,8 +11,8 @@ public class PlayerWallJumpState : PlayerState
     {
         base.Enter();
         
-        stateTimer = 1f; // ³ÖĞøÊ±¼ä
-        player.SetVelocity(5 * -player.facingDir, player.jumpForce); //Ë®Æ½·´·½ÏòÏòÉÏÌø
+        stateTimer = 1f; // æŒç»­æ—¶é—´
+        player.SetVelocity(5 * -player.facingDir, player.jumpForce); //æ°´å¹³åæ–¹å‘å‘ä¸Šè·³
     }
 
     public override void Exit()
@@ -25,18 +25,19 @@ public class PlayerWallJumpState : PlayerState
         base.Update();
 
         if (stateTimer < 0 )
-            stateMachine.ChangeState(player.airState); // µÅÇ½½áÊø½øÈë¿ÕÆø×´Ì¬£¬¿ÕÆø×´Ì¬»áÅĞ¶ÏÊÇ·ñ×²Ç½
+            stateMachine.ChangeState(player.airState); // è¹¬å¢™ç»“æŸè¿›å…¥ç©ºæ°”çŠ¶æ€ï¼Œç©ºæ°”çŠ¶æ€ä¼šåˆ¤æ–­æ˜¯å¦æ’å¢™
         else if (stateTimer < 0.5f && xInput != player.facingDir)
         {
-            player.SetVelocity(xInput * player.moveSpeed, player.jumpForce); // ÔÚµÅÇ½×´Ì¬ÏÂ£¬ÔÊĞíÍæ¼ÒË®Æ½ÒÆ¶¯
+            //@crocuser_xh è¿™é‡Œæœ‰bugï¼Œç¼ºå°‘åˆ¤æ–­äº†ï¼Œæ— è®ºå¦‚ä½•ç©å®¶éƒ½å—åˆ°äº†ä¸€ä¸ªå‘ä¸Šçš„é€Ÿåº¦ï¼Œæƒ³æ³•æ˜¯å†åŠ ä¸€ä¸ªè¹¬å¢™åçš„å°„çº¿åˆ¤æ–­
+            player.SetVelocity(xInput * player.moveSpeed, player.jumpForce); // åœ¨è¹¬å¢™çŠ¶æ€ä¸‹ï¼Œå…è®¸ç©å®¶æ°´å¹³ç§»åŠ¨
             if (!player.IsWallDetected())
-                stateMachine.ChangeState(player.airState); // Èç¹ûÃ»ÓĞ×²Ç½£¬½øÈë¿ÕÆø×´Ì¬
+                stateMachine.ChangeState(player.airState); // å¦‚æœæ²¡æœ‰æ’å¢™ï¼Œè¿›å…¥ç©ºæ°”çŠ¶æ€
         }
 
         if (player.IsWallDetected())
-            stateMachine.ChangeState(player.wallSlideState); // ×²Ç½Ç½Ôò»¬Ç½
+            stateMachine.ChangeState(player.wallSlideState); // æ’å¢™å¢™åˆ™æ»‘å¢™
 
         if (player.IsGroundDetected())
-            stateMachine.ChangeState(player.idleState); // ÂäµØ½øÈë¿ÕÏĞ
+            stateMachine.ChangeState(player.idleState); // è½åœ°è¿›å…¥ç©ºé—²
     }
 }

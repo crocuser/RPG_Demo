@@ -14,7 +14,7 @@ public class SKeletonGroundState : EnemyState
     {
         base.Enter();
 
-        player = GameObject.Find("Player").transform;
+        player = PlayerManager.instance.player.transform; // 获取玩家的Transform
     }
 
     public override void Exit()

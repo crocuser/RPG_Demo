@@ -15,7 +15,7 @@ public class SkeletonBattleState : EnemyState
     {
         base.Enter();
 
-        player = GameObject.Find("Player").transform;
+        player = PlayerManager.instance.player.transform; // è·å–ç©å®¶çš„Transform
     }
 
     public override void Exit()
@@ -29,28 +29,28 @@ public class SkeletonBattleState : EnemyState
 
         if (enemy.IsPlayerDetected())
         {
-            stateTimer = enemy.battleTime; // ½øÈëÕ½¶·×´Ì¬£¬ÉèÖÃÕ½¶·Ê±¼ä
+            stateTimer = enemy.battleTime; // è¿›å…¥æˆ˜æ–—çŠ¶æ€ï¼Œè®¾ç½®æˆ˜æ–—æ—¶é—´
 
-            // ÓëÍæ¼ÒµÄ¾àÀëĞ¡ÓÚ¹¥»÷¾àÀë£¬ÔòµĞÈËÍ£ÏÂÁË½øĞĞ¹¥»÷
+            // ä¸ç©å®¶çš„è·ç¦»å°äºæ”»å‡»è·ç¦»ï¼Œåˆ™æ•Œäººåœä¸‹äº†è¿›è¡Œæ”»å‡»
             if (enemy.IsPlayerDetected().distance < enemy.attackDistance)
             {
-                if (CanAttack()) // ¹ıÁË¹¥»÷ÀäÈ´Ê±¼ä
+                if (CanAttack()) // è¿‡äº†æ”»å‡»å†·å´æ—¶é—´
                     stateMachine.ChangeState(enemy.attackState);
             }
         }
         else
         {
             if (stateTimer < 0 || Vector2.Distance(player.transform.position, enemy.transform.position) > 15)
-                stateMachine.ChangeState(enemy.idleState); // Èç¹ûÃ»ÓĞ¼ì²âµ½Íæ¼Ò£¬ÇÒÕ½¶·Ê±¼äÒÑ¹ı£¬ÔòÇĞ»»µ½ÏĞÖÃ×´Ì¬
+                stateMachine.ChangeState(enemy.idleState); // å¦‚æœæ²¡æœ‰æ£€æµ‹åˆ°ç©å®¶ï¼Œä¸”æˆ˜æ–—æ—¶é—´å·²è¿‡ï¼Œåˆ™åˆ‡æ¢åˆ°é—²ç½®çŠ¶æ€
         }
 
-        // ÒÆ¶¯·½ÏòÅĞ¶Ï
+        // ç§»åŠ¨æ–¹å‘åˆ¤æ–­
         if (player.position.x > enemy.transform.position.x)
             moveDir = 1;
         else if (player.position.x < enemy.transform.position.x)
             moveDir = -1;
 
-        // ÉèÖÃËÙ¶È
+        // è®¾ç½®é€Ÿåº¦
         enemy.SetVelocity(enemy.moveSpeed * moveDir, rb.linearVelocity.y);
     }
 
@@ -59,7 +59,7 @@ public class SkeletonBattleState : EnemyState
     {
         if (Time.time >= enemy.lastTimeAttacked + enemy.attackCooldown)
         {
-            enemy.lastTimeAttacked = Time.time; // ¹ıÁËÀäÈ´Ê±¼ä£¬¸üĞÂÊ±¼ä£¬·µ»Øtrue
+            enemy.lastTimeAttacked = Time.time; // è¿‡äº†å†·å´æ—¶é—´ï¼Œæ›´æ–°æ—¶é—´ï¼Œè¿”å›true
             return true;
         }
         return false;

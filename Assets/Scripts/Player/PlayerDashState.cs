@@ -11,14 +11,16 @@ public class PlayerDashState : PlayerState
     {
         base.Enter();
 
-        stateTimer = player.dashDuration; // ³å´ÌÊ±¼ä
+        player.skill.clone.CreateClone(player.transform); // åˆ›å»ºå†²åˆºå…‹éš†
+
+        stateTimer = player.dashDuration; // å†²åˆºæ—¶é—´
     }
 
     public override void Exit()
     {
         base.Exit();
 
-        player.SetVelocity(0, rb.linearVelocity.y); // ÍË³ö³å´ÌÊ±ÖØÖÃËÙ¶È
+        player.SetVelocity(0, rb.linearVelocity.y); // é€€å‡ºå†²åˆºæ—¶é‡ç½®é€Ÿåº¦
     }
 
     public override void Update()
@@ -29,9 +31,9 @@ public class PlayerDashState : PlayerState
         {
             stateMachine.ChangeState(player.idleState);
             return;
-        }//³å´Ì½áÊø»ò×²Ç½£¬»Øµ½¿ÕÏĞ×´Ì¬
+        }//å†²åˆºç»“æŸæˆ–æ’å¢™ï¼Œå›åˆ°ç©ºé—²çŠ¶æ€
 
-        player.SetVelocity(player.dashSpeed * player.dashDir, 0); // ¸øÓè³å´ÌËÙ¶È£¬²¢ÇÒ³å´ÌÊ±yÖáËÙ¶ÈÉèÖÃÎª0£¬µ«ÊÇ¸ÕÌåµÄÖØÁ¦Ò»Ö±´æÔÚ£¬²»»áÓĞ³å´ÌÍêÁËºó»¹ÏòÉÏ·ÉµÄÇé¿ö¡£
+        player.SetVelocity(player.dashSpeed * player.dashDir, 0); // ç»™äºˆå†²åˆºé€Ÿåº¦ï¼Œå¹¶ä¸”å†²åˆºæ—¶yè½´é€Ÿåº¦è®¾ç½®ä¸º0ï¼Œä½†æ˜¯åˆšä½“çš„é‡åŠ›ä¸€ç›´å­˜åœ¨ï¼Œä¸ä¼šæœ‰å†²åˆºå®Œäº†åè¿˜å‘ä¸Šé£çš„æƒ…å†µã€‚
 
     }
 }
