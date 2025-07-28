@@ -12,6 +12,7 @@ public class Player : Entity
     [Header("Move info")]
     public float moveSpeed = 10f;
     public float jumpForce = 12f;
+    public float swordReturnImpact; // 剑返回冲击力
 
     [Header("Dash info")]
     public float dashSpeed = 28f;
@@ -19,6 +20,7 @@ public class Player : Entity
     public float dashDir { get; private set; } // 为什么不是int
 
     public SkillManager skill { get; private set; }
+    public GameObject sword { get; private set; }
 
     #region Statess
     public PlayerStateMachine stateMachine { get; private set; }
@@ -32,6 +34,8 @@ public class Player : Entity
     public PlayerWallJumpState wallJumpState { get; private set; }
     public PlayerPrimaryAttackState primaryAttackState { get; private set; }
     public PlayerCounterAttackState counterAttackState { get; private set; } // 反击状态
+    public PlayerAimSwordState aimSwordState { get; private set; } // 瞄准剑状态（如果有的话）
+    public PlayerCatchSwordState catchSwordState { get; private set; } // 拿剑状态（如果有的话）
 
     #endregion
 
@@ -49,6 +53,8 @@ public class Player : Entity
         wallJumpState = new PlayerWallJumpState(this, stateMachine, "Jump");
         primaryAttackState = new PlayerPrimaryAttackState(this, stateMachine, "Attack");
         counterAttackState = new PlayerCounterAttackState(this, stateMachine, "CounterAttack"); // 反击状态
+        aimSwordState = new PlayerAimSwordState(this, stateMachine, "AimSword"); // 瞄准剑状态（如果有的话）
+        catchSwordState = new PlayerCatchSwordState(this, stateMachine, "CatchSword"); // 拿剑状态（如果有的话）
     }
 
     protected override void Start()
@@ -68,6 +74,17 @@ public class Player : Entity
 
         CheckForDashInput(); // 玩家在任何状态下都可以冲刺，这是合理的，因为冲刺是为了规避某些高伤害
 
+    }
+
+    public void AssignNewSword(GameObject _newSword)
+    {
+        sword = _newSword; // 分配新的剑
+    }
+
+    public void CatchTheSword()
+    {
+        stateMachine.ChangeState(catchSwordState); // 切换到抓回剑状态
+        Destroy(sword); // 销毁当前剑
     }
 
     public IEnumerator BusyFor(float _seconds) 

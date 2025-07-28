@@ -4,7 +4,7 @@ using UnityEngine;
 public class Entity : MonoBehaviour
 {
 
-    //#region ÊÇ C# µÄÔ¤´¦ÀíÖ¸Áî£¬ÓÃÓÚÔÚ´úÂëÖĞ¶¨ÒåÒ»¸ö¿ÉÕÛµşµÄÇøÓò£¬·½±ã´úÂë×éÖ¯¡£ctrl+k;ctrl+s
+    //#region æ˜¯ C# çš„é¢„å¤„ç†æŒ‡ä»¤ï¼Œç”¨äºåœ¨ä»£ç ä¸­å®šä¹‰ä¸€ä¸ªå¯æŠ˜å çš„åŒºåŸŸï¼Œæ–¹ä¾¿ä»£ç ç»„ç»‡ã€‚ctrl+k;ctrl+s
     #region Components
     public Animator anim { get; private set; }
     public Rigidbody2D rb { get; private set; }
@@ -13,13 +13,13 @@ public class Entity : MonoBehaviour
     #endregion
 
     [Header("Knockback info")]
-    [SerializeField] protected Vector2 knockbackDirection; // »÷ÍË·½Ïò
-    [SerializeField] protected float knockbackDuration; // »÷ÍË³ÖĞøÊ±¼ä
-    protected bool isKnocked; // ÊÇ·ñ»÷ÍË
+    [SerializeField] protected Vector2 knockbackDirection; // å‡»é€€æ–¹å‘
+    [SerializeField] protected float knockbackDuration; // å‡»é€€æŒç»­æ—¶é—´
+    protected bool isKnocked; // æ˜¯å¦å‡»é€€
 
     [Header("Collision info")]
     public Transform attackCheck;
-    public float attackCheckRadius; // ¹¥»÷¼ì²â°ë¾¶
+    public float attackCheckRadius; // æ”»å‡»æ£€æµ‹åŠå¾„
     [SerializeField] protected Transform groundCheck;
     [SerializeField] protected float groundCheckDistance;
     [SerializeField] protected LayerMask whatIsGround;
@@ -37,8 +37,8 @@ public class Entity : MonoBehaviour
 
     protected virtual void Start()
     {
-        fx = GetComponentInChildren<EnityFX>(); // »ñÈ¡×Ó×é¼ş EnityFX
-        anim = GetComponentInChildren<Animator>(); // »ñÈ¡×Ó×é¼ş Animator
+        fx = GetComponentInChildren<EnityFX>(); // è·å–å­ç»„ä»¶ EnityFX
+        anim = GetComponentInChildren<Animator>(); // è·å–å­ç»„ä»¶ Animator
         rb = GetComponent<Rigidbody2D>();
 
     }
@@ -50,18 +50,18 @@ public class Entity : MonoBehaviour
 
     public virtual void Damage()
     {
-        fx.StartCoroutine("FlashFX"); // µ÷ÓÃ EnityFX ÖĞµÄÉÁË¸ÌØĞ§Ğ­³Ì
-        StartCoroutine("HitKnockback"); // µ÷ÓÃ»÷ÍËĞ­³Ì
-        Debug.Log(gameObject.name + " is damaged!");
+        fx.StartCoroutine("FlashFX"); // è°ƒç”¨ EnityFX ä¸­çš„é—ªçƒç‰¹æ•ˆåç¨‹
+        StartCoroutine("HitKnockback"); // è°ƒç”¨å‡»é€€åç¨‹
+        //Debug.Log(gameObject.name + " is damaged!");
     }
 
     protected virtual IEnumerator HitKnockback()
     {
-        isKnocked = true; // ÉèÖÃÎª±»»÷ÍË×´Ì¬
+        isKnocked = true; // è®¾ç½®ä¸ºè¢«å‡»é€€çŠ¶æ€
 
         rb.linearVelocity = new Vector2(knockbackDirection.x * -facingDir, knockbackDirection.y);
 
-        yield return new WaitForSeconds(knockbackDuration); // µÈ´ı»÷ÍË³ÖĞøÊ±¼ä
+        yield return new WaitForSeconds(knockbackDuration); // ç­‰å¾…å‡»é€€æŒç»­æ—¶é—´
         isKnocked = false;
     }
 
@@ -69,7 +69,7 @@ public class Entity : MonoBehaviour
     public void SetZeroVelocity()
     {
         if (isKnocked)
-            return; // Èç¹û±»»÷ÍË£¬Ôò²»ÉèÖÃËÙ¶È
+            return; // å¦‚æœè¢«å‡»é€€ï¼Œåˆ™ä¸è®¾ç½®é€Ÿåº¦
 
         rb.linearVelocity = new Vector2(0, 0);
     }
@@ -78,16 +78,16 @@ public class Entity : MonoBehaviour
     {
 
         if (isKnocked)
-            return; // Èç¹û±»»÷ÍË£¬Ôò²»ÉèÖÃËÙ¶È
+            return; // å¦‚æœè¢«å‡»é€€ï¼Œåˆ™ä¸è®¾ç½®é€Ÿåº¦
 
         rb.linearVelocity = new Vector2(_xVelocity, _yVelocity);
-        FlipController(_xVelocity); // ÉèÖÃËÙ¶ÈÊ±£¬½øĞĞ·­×ª¿ØÖÆ£¬Ì«ÓÅÑÅÁË
+        FlipController(_xVelocity); // è®¾ç½®é€Ÿåº¦æ—¶ï¼Œè¿›è¡Œç¿»è½¬æ§åˆ¶ï¼Œå¤ªä¼˜é›…äº†
     }
     #endregion
 
     #region Collision
-    public bool IsGroundDetected() => Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDistance, whatIsGround); // µØÃæ¼ì²â£¬lambda±í´ïÊ½
-    public bool IsWallDetected() => Physics2D.Raycast(wallCheck.position, Vector2.right * facingDir, wallCheckDistance, whatIsGround); // Ç½Ìå¼ì²â
+    public bool IsGroundDetected() => Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDistance, whatIsGround); // åœ°é¢æ£€æµ‹ï¼Œlambdaè¡¨è¾¾å¼
+    public bool IsWallDetected() => Physics2D.Raycast(wallCheck.position, Vector2.right * facingDir, wallCheckDistance, whatIsGround); // å¢™ä½“æ£€æµ‹
 
     protected virtual void OnDrawGizmos()
     {
@@ -100,7 +100,7 @@ public class Entity : MonoBehaviour
     #region Flip
     public virtual void Flip()
     {
-        // ·­×ª²Ù×÷
+        // ç¿»è½¬æ“ä½œ
         facingDir = facingDir * -1;
         facingRight = !facingRight;
         transform.Rotate(0, 180, 0);

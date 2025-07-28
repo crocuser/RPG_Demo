@@ -2,21 +2,26 @@ using UnityEngine;
 
 public class PlayerAnimationTriggers : MonoBehaviour
 {
-    //¶¯»­ÊÂ¼şÖ»ÄÜµ÷ÓÃ±¾ÎïÌåÉÏµÄº¯Êı¡£
-    private Player player => GetComponentInParent<Player>(); // ¸Ã½Å±¾×÷ÓÃÓëanimator£¬ËüµÄ¸¸Ç×ÊÇplayer
+    //åŠ¨ç”»äº‹ä»¶åªèƒ½è°ƒç”¨æœ¬ç‰©ä½“ä¸Šçš„å‡½æ•°ã€‚
+    private Player player => GetComponentInParent<Player>(); // è¯¥è„šæœ¬ä½œç”¨ä¸animatorï¼Œå®ƒçš„çˆ¶äº²æ˜¯player
 
     private void AnimationTrigger()
     {
-        player.AnimationTrigger(); // ×´Ì¬ÓµÓĞ½áÊø´¥·¢Æ÷£¬player½«Æä·â×°£¬²¢¶ÔÍâ¿ª·Å£¬±ãÓÚµ÷ÓÃ
+        player.AnimationTrigger(); // çŠ¶æ€æ‹¥æœ‰ç»“æŸè§¦å‘å™¨ï¼Œplayerå°†å…¶å°è£…ï¼Œå¹¶å¯¹å¤–å¼€æ”¾ï¼Œä¾¿äºè°ƒç”¨
     }
 
     private void AttackTrigger()
     {
-        // ÊÕ¼¯¹¥»÷·¶Î§ÄÚµÄËùÓĞÅö×²Ìå
+        // æ”¶é›†æ”»å‡»èŒƒå›´å†…çš„æ‰€æœ‰ç¢°æ’ä½“
         Collider2D[] colliders = Physics2D.OverlapCircleAll(player.attackCheck.position, player.attackCheckRadius);
 
         foreach (var hit in colliders)
             if (hit.GetComponent<Enemy>() != null)
                 hit.GetComponent<Enemy>().Damage();
+    }
+
+    private void ThrowSword()
+    {
+        SkillManager.instance.sword.CreateSword();
     }
 }

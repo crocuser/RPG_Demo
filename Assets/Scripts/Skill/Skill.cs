@@ -5,6 +5,13 @@ public class Skill : MonoBehaviour
     [SerializeField] protected float cooldown; // 技能冷却时间
     protected float cooldownTimer; // 技能冷却计时器
 
+    protected Player player;
+
+    protected virtual void Start()
+    {
+        player = PlayerManager.instance.player;
+    }
+
     protected virtual void Update() // 嗯，注意Update首字母大写，以及Unity自带的方法是蓝色标识
     {
         cooldownTimer -= Time.deltaTime; // 减少冷却计时器
