@@ -1,7 +1,21 @@
 using UnityEngine;
 
+public enum SwordType
+{
+    Regular, // 普通技能
+    Bounce, // 反弹技能
+    Pierce, // 穿透技能
+    Spin // 旋转技能
+}
+
 public class Sword_Skill : Skill
 {
+    public SwordType swordType = SwordType.Regular;
+
+    [Header("Bounce info")]
+    [SerializeField] private int amountOfBounces; // 反弹次数
+    [SerializeField] private float bounceGravity; // 反弹时的重力
+
     [Header("Skill info")]
     [SerializeField] private GameObject swordPrefab; // 剑的预制体
     [SerializeField] private Vector2 launchForce; // 剑的发射方向
@@ -41,6 +55,12 @@ public class Sword_Skill : Skill
         GameObject newSword = Instantiate(swordPrefab, player.transform.position, transform.rotation);
         Sword_Skill_Controller newSwordScript = newSword.GetComponent<Sword_Skill_Controller>();
 
+        if (swordType == SwordType.Bounce)
+        {
+            swordGravity = bounceGravity; // 设置反弹时的重力
+            newSwordScript.SetupBounce(true, amountOfBounces); // 设置反弹技能
+        }
+
         newSwordScript.SetupSword(finalDir, swordGravity, player); // 设置剑的发射方向和重力
 
         player.AssignNewSword(newSword); // 将新剑分配给玩家
@@ -48,6 +68,7 @@ public class Sword_Skill : Skill
         DotsActive(false); // 剑已发射，禁用瞄准点
     }
 
+    #region Aim region
     public Vector2 AimDirection()
     {
         Vector2 playerPosition = player.transform.position; // 获取玩家位置
@@ -68,7 +89,7 @@ public class Sword_Skill : Skill
 
     private void GenerateDots()
     {
-        dots = new GameObject[numberOfDots];    
+        dots = new GameObject[numberOfDots];
         for (int i = 0; i < numberOfDots; i++)
         {
             dots[i] = Instantiate(dotPrefab, player.transform.position, Quaternion.identity, dotsParent);
@@ -82,4 +103,5 @@ public class Sword_Skill : Skill
 
         return position;
     }
+    #endregion Aim region
 }

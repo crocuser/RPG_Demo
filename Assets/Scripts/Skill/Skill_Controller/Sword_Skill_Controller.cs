@@ -1,3 +1,5 @@
+using NUnit.Framework;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Sword_Skill_Controller : MonoBehaviour
@@ -10,6 +12,16 @@ public class Sword_Skill_Controller : MonoBehaviour
     [SerializeField] private float returnSpeed = 12f; // 返回玩家手中的速度
     private bool canRotate = true;
     private bool isReturning = false; // 是否正在返回玩家手中
+
+    // 剑技能的升级版，在一定范围内进行索敌反弹攻击一定次数
+    [Header("Bounce info")]
+    [SerializeField] private float bounceSpeed; // 反弹攻击的速度
+    private bool isBouncing; // 是否可以反弹攻击
+    private int amountOfBounces; // 反弹次数
+    private List<Transform> enemyTarget; // 目标敌人列表，用于存储反弹攻击的目标
+    private int targetIndex; // 当前目标索引
+
+
     private void Awake()
     {
         anim = GetComponentInChildren<Animator>();
@@ -24,6 +36,14 @@ public class Sword_Skill_Controller : MonoBehaviour
         rb.gravityScale = _gravityScale;
 
         anim.SetBool("Rotation", true);
+    }
+
+    public void SetupBounce(bool _isBouncing, int _amountOfBounces)
+    {
+        isBouncing = _isBouncing; // 设置是否可以反弹攻击
+        amountOfBounces = _amountOfBounces; // 设置反弹次数
+
+        enemyTarget = new List<Transform>(); // 初始化目标敌人列表，如果是私有的，需要初始化列表
     }
 
     public void ReturnSword()
@@ -44,7 +64,7 @@ public class Sword_Skill_Controller : MonoBehaviour
 
         if (isReturning)
         {
-            transform.position=Vector2.MoveTowards(transform.position, player.transform.position, returnSpeed * Time.deltaTime); // 将剑移动到玩家位置，平滑移动
+            transform.position = Vector2.MoveTowards(transform.position, player.transform.position, returnSpeed * Time.deltaTime); // 将剑移动到玩家位置，平滑移动
 
             if (Vector2.Distance(transform.position, player.transform.position) < 1)
             {
@@ -53,19 +73,70 @@ public class Sword_Skill_Controller : MonoBehaviour
             }
         }
 
+        BounceLogic();
+
     }
+
+    private void BounceLogic()
+    {
+        if (isBouncing && enemyTarget.Count > 0)
+        {
+            transform.position = Vector2.MoveTowards(transform.position, enemyTarget[targetIndex].position, bounceSpeed * Time.deltaTime);
+
+            if (Vector2.Distance(transform.position, enemyTarget[targetIndex].position) < .1f)
+            {
+                targetIndex++; // 移动到下一个目标
+
+                amountOfBounces--; // 减少反弹次数
+
+                if (amountOfBounces <= 0)
+                {
+                    isBouncing = false; // 如果反弹次数用完，则停止反弹攻击
+                    isReturning = true; // 开始返回玩家手中
+                }
+
+                if (targetIndex >= enemyTarget.Count)
+                    targetIndex = 0; // 如果到达最后一个目标，则重置索引
+            }
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (isReturning)
             return; // 如果正在返回玩家手中，则不处理碰撞
 
-        anim.SetBool("Rotation", false);
+        // 如果碰撞到敌人，则收集敌人位置并填充目标列表
+        if (collision.GetComponent<Enemy>() != null)
+        {
+            if (isBouncing && enemyTarget.Count <= 0)
+            {
+                Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 10); // 在一定范围内检测敌人
+
+                foreach (var hit in colliders)
+                {
+                    if (hit.GetComponent<Enemy>() != null)
+                        enemyTarget.Add(hit.transform); // 将检测到的敌人添加到目标列表中
+
+                }
+            }
+        }
+
+        StuckInto(collision);
+    }
+
+    private void StuckInto(Collider2D collision)
+    {
         canRotate = false;
         cd.enabled = false; // 禁用碰撞体，防止多次触发
 
         rb.bodyType = RigidbodyType2D.Kinematic; // 使用 bodyType 替代已过时的 isKinematic, 使剑 不受物理引擎影响（如重力、碰撞力），但仍可通过代码控制移动。
         rb.constraints = RigidbodyConstraints2D.FreezeAll; // 冻结所有约束，防止物理交互
 
+        if (isBouncing && enemyTarget.Count > 0)
+            return; // 如果是反弹攻击，则不执行后续操作
+
+        anim.SetBool("Rotation", false);
         transform.parent = collision.transform; // 将剑设置为碰撞物体的子物体, 使剑 跟随目标移动（例如剑插在敌人身上，敌人移动时剑也会移动）。
     }
 }
