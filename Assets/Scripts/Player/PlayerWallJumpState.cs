@@ -24,11 +24,11 @@ public class PlayerWallJumpState : PlayerState
     {
         base.Update();
 
-        if (stateTimer < 0 )
+        if (stateTimer < 0)
             stateMachine.ChangeState(player.airState); // 蹬墙结束进入空气状态，空气状态会判断是否撞墙
-        else if (stateTimer < 0.5f && xInput != player.facingDir)
+        else if (stateTimer < 0.5f && xInput != player.facingDir && xInput != 0)
         {
-            //@crocuser_xh 这里有bug，缺少判断了，无论如何玩家都受到了一个向上的速度，想法是再加一个蹬墙后的射线判断
+            //@crocuser_xh 这里有bug，缺少判断了，无论如何玩家都受到了一个向上的速度，想法是再加一个蹬墙后的射线判断，直接加判断x轴必须有输入，问题解决了
             player.SetVelocity(xInput * player.moveSpeed, player.jumpForce); // 在蹬墙状态下，允许玩家水平移动
             if (!player.IsWallDetected())
                 stateMachine.ChangeState(player.airState); // 如果没有撞墙，进入空气状态

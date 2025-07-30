@@ -221,4 +221,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   returnSpeed: 12
+  pierceAmount: 0
   bounceSpeed: 20

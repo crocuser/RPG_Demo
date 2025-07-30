@@ -13,11 +13,14 @@ public class Sword_Skill_Controller : MonoBehaviour
     private bool canRotate = true;
     private bool isReturning = false; // 是否正在返回玩家手中
 
-    // 剑技能的升级版，在一定范围内进行索敌反弹攻击一定次数
+    [Header("Pierce info")]
+    [SerializeField] private int pierceAmount; // 穿透攻击的伤害量
+
+
     [Header("Bounce info")]
     [SerializeField] private float bounceSpeed; // 反弹攻击的速度
     private bool isBouncing; // 是否可以反弹攻击
-    private int amountOfBounces; // 反弹次数
+    private int bounceAmount; // 反弹次数
     private List<Transform> enemyTarget; // 目标敌人列表，用于存储反弹攻击的目标
     private int targetIndex; // 当前目标索引
 
@@ -35,17 +38,22 @@ public class Sword_Skill_Controller : MonoBehaviour
         rb.linearVelocity = _dir;
         rb.gravityScale = _gravityScale;
 
-        anim.SetBool("Rotation", true);
+        if (pierceAmount <= 0)
+            anim.SetBool("Rotation", true);// 如果没有穿透攻击，则开始旋转动画
     }
 
-    public void SetupBounce(bool _isBouncing, int _amountOfBounces)
+    public void SetupBounce(bool _isBouncing, int _bounceAmount)
     {
         isBouncing = _isBouncing; // 设置是否可以反弹攻击
-        amountOfBounces = _amountOfBounces; // 设置反弹次数
+        bounceAmount = _bounceAmount; // 设置反弹次数
 
         enemyTarget = new List<Transform>(); // 初始化目标敌人列表，如果是私有的，需要初始化列表
     }
 
+    public void SetupPierce(int _pierceAmount)
+    {
+        pierceAmount = _pierceAmount;
+    }
     public void ReturnSword()
     {
         //rb.bodyType = RigidbodyType2D.Dynamic; // 恢复物理属性，使剑受重力和碰撞影响
@@ -87,9 +95,9 @@ public class Sword_Skill_Controller : MonoBehaviour
             {
                 targetIndex++; // 移动到下一个目标
 
-                amountOfBounces--; // 减少反弹次数
+                bounceAmount--; // 减少反弹次数
 
-                if (amountOfBounces <= 0)
+                if (bounceAmount <= 0)
                 {
                     isBouncing = false; // 如果反弹次数用完，则停止反弹攻击
                     isReturning = true; // 开始返回玩家手中
@@ -105,6 +113,8 @@ public class Sword_Skill_Controller : MonoBehaviour
     {
         if (isReturning)
             return; // 如果正在返回玩家手中，则不处理碰撞
+
+        collision.GetComponent<Enemy>()?.Damage(); // 如果碰撞到敌人，则对敌人造成伤害
 
         // 如果碰撞到敌人，则收集敌人位置并填充目标列表
         if (collision.GetComponent<Enemy>() != null)
@@ -127,6 +137,13 @@ public class Sword_Skill_Controller : MonoBehaviour
 
     private void StuckInto(Collider2D collision)
     {
+
+        if (pierceAmount > 0 && collision.GetComponent<Enemy>() != null)
+        {
+            pierceAmount--; // 如果是穿透攻击，则减少穿透次数
+            return;
+        }
+
         canRotate = false;
         cd.enabled = false; // 禁用碰撞体，防止多次触发
 

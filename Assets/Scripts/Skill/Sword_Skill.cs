@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public enum SwordType
@@ -13,8 +14,13 @@ public class Sword_Skill : Skill
     public SwordType swordType = SwordType.Regular;
 
     [Header("Bounce info")]
-    [SerializeField] private int amountOfBounces; // 反弹次数
+    [SerializeField] private int bounceAmount; // 反弹次数
     [SerializeField] private float bounceGravity; // 反弹时的重力
+
+
+    [Header("Pierce info")]
+    [SerializeField] private int pierceAmount;
+    [SerializeField] private float pierceGravity;
 
     [Header("Skill info")]
     [SerializeField] private GameObject swordPrefab; // 剑的预制体
@@ -34,10 +40,24 @@ public class Sword_Skill : Skill
     protected override void Start()
     {
         base.Start();
+
         GenerateDots(); // 生成瞄准点
+
     }
+
+    private void SetupGraivity()
+    {
+        if (swordType == SwordType.Bounce)
+            swordGravity = bounceGravity;
+        else if (swordType == SwordType.Pierce)
+            swordGravity = pierceGravity;
+ 
+    }
+
     protected override void Update()
     {
+        SetupGraivity(); // 设置剑的重力
+
         if (Input.GetKeyUp(KeyCode.Mouse1))
             finalDir = new Vector2(AimDirection().x * launchForce.x, AimDirection().y * launchForce.y);
 
@@ -56,11 +76,10 @@ public class Sword_Skill : Skill
         Sword_Skill_Controller newSwordScript = newSword.GetComponent<Sword_Skill_Controller>();
 
         if (swordType == SwordType.Bounce)
-        {
-            swordGravity = bounceGravity; // 设置反弹时的重力
-            newSwordScript.SetupBounce(true, amountOfBounces); // 设置反弹技能
-        }
-
+            newSwordScript.SetupBounce(true, bounceAmount); // 设置反弹技能
+        else if (swordType == SwordType.Pierce)
+            newSwordScript.SetupPierce(pierceAmount);
+        
         newSwordScript.SetupSword(finalDir, swordGravity, player); // 设置剑的发射方向和重力
 
         player.AssignNewSword(newSword); // 将新剑分配给玩家
