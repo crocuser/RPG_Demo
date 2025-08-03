@@ -85,6 +85,7 @@ public class Player : Entity
     {
         stateMachine.ChangeState(catchSwordState); // 切换到抓回剑状态
         Destroy(sword); // 销毁当前剑
+        sword = null; // 清空剑引用
     }
 
     public IEnumerator BusyFor(float _seconds) 

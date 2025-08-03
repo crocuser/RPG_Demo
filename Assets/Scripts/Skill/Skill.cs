@@ -26,7 +26,7 @@ public class Skill : MonoBehaviour
             return true; // 可以使用技能
         }
 
-        Debug.Log("Skill is on cooldown");
+        // Debug.Log("Skill is on cooldown");
         return false; // 技能冷却中，不能使用技能
     }
 

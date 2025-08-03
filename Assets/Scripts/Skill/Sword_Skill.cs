@@ -22,6 +22,12 @@ public class Sword_Skill : Skill
     [SerializeField] private int pierceAmount;
     [SerializeField] private float pierceGravity;
 
+    [Header("Spin info")]
+    [SerializeField] private float hitCooldown = .35f;
+    [SerializeField] private float maxTravelDistance = 7;
+    [SerializeField] private float spinDuration = 2;
+    [SerializeField] private float spinGravity = 1;
+
     [Header("Skill info")]
     [SerializeField] private GameObject swordPrefab; // 剑的预制体
     [SerializeField] private Vector2 launchForce; // 剑的发射方向
@@ -51,7 +57,9 @@ public class Sword_Skill : Skill
             swordGravity = bounceGravity;
         else if (swordType == SwordType.Pierce)
             swordGravity = pierceGravity;
- 
+        else if (swordType == SwordType.Spin)
+            swordGravity = spinGravity;
+
     }
 
     protected override void Update()
@@ -79,8 +87,10 @@ public class Sword_Skill : Skill
             newSwordScript.SetupBounce(true, bounceAmount); // 设置反弹技能
         else if (swordType == SwordType.Pierce)
             newSwordScript.SetupPierce(pierceAmount);
-        
-        newSwordScript.SetupSword(finalDir, swordGravity, player); // 设置剑的发射方向和重力
+        else if (swordType == SwordType.Spin)
+            newSwordScript.SetupSpin(true, maxTravelDistance, spinDuration, hitCooldown);
+
+            newSwordScript.SetupSword(finalDir, swordGravity, player); // 设置剑的发射方向和重力
 
         player.AssignNewSword(newSword); // 将新剑分配给玩家
 

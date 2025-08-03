@@ -24,6 +24,17 @@ public class Sword_Skill_Controller : MonoBehaviour
     private List<Transform> enemyTarget; // 目标敌人列表，用于存储反弹攻击的目标
     private int targetIndex; // 当前目标索引
 
+    [Header("Spin info")]
+    private float maxTravelDistance; // 最大飞行距离
+    private float spinaDuration; // 旋转持续时间
+    private float spinTimer; // 旋转计时器
+    private bool wasStopped; // 旋转停止标志
+    private bool isSpinning; // 是否正在旋转
+
+    private float hitTimer;
+    private float hitCooldown;
+
+    private float spinDirection; // 旋转方向
 
     private void Awake()
     {
@@ -40,6 +51,8 @@ public class Sword_Skill_Controller : MonoBehaviour
 
         if (pierceAmount <= 0)
             anim.SetBool("Rotation", true);// 如果没有穿透攻击，则开始旋转动画
+
+        spinDirection = Mathf.Clamp(rb.linearVelocity.x, -1, 1); // 限制旋转方向为-1到1之间，避免过大或过小的值导致异常行为
     }
 
     public void SetupBounce(bool _isBouncing, int _bounceAmount)
@@ -53,6 +66,14 @@ public class Sword_Skill_Controller : MonoBehaviour
     public void SetupPierce(int _pierceAmount)
     {
         pierceAmount = _pierceAmount;
+    }
+
+    public void SetupSpin(bool _isSpinning, float _maxTravelDistance, float _spinDuration, float _hitCooldown)
+    {
+        isSpinning = _isSpinning;
+        maxTravelDistance = _maxTravelDistance;
+        spinaDuration = _spinDuration;
+        hitCooldown = _hitCooldown;
     }
     public void ReturnSword()
     {
@@ -83,6 +104,54 @@ public class Sword_Skill_Controller : MonoBehaviour
 
         BounceLogic();
 
+        SpinLogic();
+
+    }
+
+    private void SpinLogic()
+    {
+        if (isSpinning)
+        {
+            if (Vector2.Distance(player.transform.position, transform.position) > maxTravelDistance && !wasStopped)
+            {
+                StopWhenSpinning();
+            }
+
+            if (wasStopped)
+            {
+                spinTimer -= Time.deltaTime;
+
+                transform.position = Vector2.MoveTowards(transform.position, new Vector2(transform.position.x + spinDirection, transform.position.y), 1.5f * Time.deltaTime); // 旋转时，剑沿着水平方向移动
+
+                if (spinTimer <= 0)
+                {
+                    isReturning = true;
+                    isSpinning = false;
+                }
+
+                hitTimer -= Time.deltaTime;
+
+                if (hitTimer <= 0)
+                {
+                    hitTimer = hitCooldown; // 攻击频率冷却
+                    Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 1); // 在一定范围内检测敌人
+
+                    foreach (var hit in colliders)
+                    {
+                        if (hit.GetComponent<Enemy>() != null)
+                            hit.GetComponent<Enemy>().Damage(); // 对敌人造成伤害
+                    }
+                }
+                // Debug.Log("Spinning... " + spinTimer); // 打印旋转计时器信息
+            }
+        }
+    }
+
+    private void StopWhenSpinning()
+    {
+        wasStopped = true;
+        rb.constraints = RigidbodyConstraints2D.FreezePosition; // 冻结位置，停止剑的移动
+        spinTimer = spinaDuration;
     }
 
     private void BounceLogic()
@@ -93,6 +162,8 @@ public class Sword_Skill_Controller : MonoBehaviour
 
             if (Vector2.Distance(transform.position, enemyTarget[targetIndex].position) < .1f)
             {
+                enemyTarget[targetIndex].GetComponent<Enemy>().Damage(); // 对目标敌人造成伤害
+
                 targetIndex++; // 移动到下一个目标
 
                 bounceAmount--; // 减少反弹次数
@@ -117,6 +188,13 @@ public class Sword_Skill_Controller : MonoBehaviour
         collision.GetComponent<Enemy>()?.Damage(); // 如果碰撞到敌人，则对敌人造成伤害
 
         // 如果碰撞到敌人，则收集敌人位置并填充目标列表
+        SetupTargetsForBounce(collision);
+
+        StuckInto(collision);
+    }
+
+    private void SetupTargetsForBounce(Collider2D collision)
+    {
         if (collision.GetComponent<Enemy>() != null)
         {
             if (isBouncing && enemyTarget.Count <= 0)
@@ -131,8 +209,6 @@ public class Sword_Skill_Controller : MonoBehaviour
                 }
             }
         }
-
-        StuckInto(collision);
     }
 
     private void StuckInto(Collider2D collision)
@@ -141,6 +217,12 @@ public class Sword_Skill_Controller : MonoBehaviour
         if (pierceAmount > 0 && collision.GetComponent<Enemy>() != null)
         {
             pierceAmount--; // 如果是穿透攻击，则减少穿透次数
+            return;
+        }
+
+        if (isSpinning)
+        {
+            StopWhenSpinning(); // 如果碰撞物体，则固定位置
             return;
         }
 
