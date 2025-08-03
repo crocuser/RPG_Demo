@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class Enemy : Entity
@@ -14,6 +15,7 @@ public class Enemy : Entity
     public float moveSpeed;
     public float idleTime;
     public float battleTime; // 战斗时间，敌人会在这个时间内攻击玩家
+    private float defaultMoveSpeed; // 默认移动速度，用于复位
 
     [Header("Attack info")]
     public float attackDistance; // 攻击距离
@@ -27,6 +29,7 @@ public class Enemy : Entity
         base.Awake();
         stateMachine = new EnemyStateMachine();
 
+        defaultMoveSpeed = moveSpeed; // 保存默认移动速度
     }
 
     protected override void Update()
@@ -39,6 +42,30 @@ public class Enemy : Entity
         //    Debug.Log(rch.collider.gameObject.name + " I SEE");
     }
 
+    public virtual void FreezeTime(bool _timeFrozen)
+    {
+        if (_timeFrozen)
+        {
+            moveSpeed = 0;
+            anim.speed = 0;
+        }
+        else
+        {
+            moveSpeed = defaultMoveSpeed; // 恢复默认移动速度
+            anim.speed = 1;
+        }
+    }
+
+    protected virtual IEnumerator FreezeTimeFor(float _seconds)
+    {
+        FreezeTime(true);
+
+        yield return new WaitForSeconds(_seconds);
+
+        FreezeTime(false);
+    }
+
+    #region Counter Attack Window
     public virtual void OpenCounterAttackWindow() // 打开反击击晕敌人时的图像提示
     {
         canBeStunned = true;
@@ -50,6 +77,7 @@ public class Enemy : Entity
         canBeStunned = false;
         counterImage.SetActive(false); // 隐藏反击图像提示
     }
+    #endregion
 
     public virtual bool CanBeStunned()
     {

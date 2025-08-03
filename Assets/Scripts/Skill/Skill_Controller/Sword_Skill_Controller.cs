@@ -9,16 +9,18 @@ public class Sword_Skill_Controller : MonoBehaviour
     private CircleCollider2D cd;
     private Player player;
 
-    [SerializeField] private float returnSpeed = 12f; // 返回玩家手中的速度
     private bool canRotate = true;
     private bool isReturning = false; // 是否正在返回玩家手中
+
+    private float freezeTimeDuration; // 冻结时间持续时间
+    private float returnSpeed; // 返回玩家手中的速度
 
     [Header("Pierce info")]
     [SerializeField] private int pierceAmount; // 穿透攻击的伤害量
 
 
     [Header("Bounce info")]
-    [SerializeField] private float bounceSpeed; // 反弹攻击的速度
+    private float bounceSpeed; // 反弹攻击的速度
     private bool isBouncing; // 是否可以反弹攻击
     private int bounceAmount; // 反弹次数
     private List<Transform> enemyTarget; // 目标敌人列表，用于存储反弹攻击的目标
@@ -43,9 +45,17 @@ public class Sword_Skill_Controller : MonoBehaviour
         cd = GetComponent<CircleCollider2D>();
     }
 
-    public void SetupSword(Vector2 _dir, float _gravityScale, Player _player)
+    private void DestroyMe()
+    {
+        Destroy(gameObject); // 销毁当前游戏对象，当剑飞出太远时，销毁剑
+    }
+
+    public void SetupSword(Vector2 _dir, float _gravityScale, Player _player, float _freezeTimeDuration, float _returnSpeed)
     {
         player = _player; // 设置玩家引用，便于后续操作
+        freezeTimeDuration = _freezeTimeDuration;
+        returnSpeed = _returnSpeed; // 设置返回速度
+
         rb.linearVelocity = _dir;
         rb.gravityScale = _gravityScale;
 
@@ -53,12 +63,15 @@ public class Sword_Skill_Controller : MonoBehaviour
             anim.SetBool("Rotation", true);// 如果没有穿透攻击，则开始旋转动画
 
         spinDirection = Mathf.Clamp(rb.linearVelocity.x, -1, 1); // 限制旋转方向为-1到1之间，避免过大或过小的值导致异常行为
+
+        Invoke("DestroyMe", 7);
     }
 
-    public void SetupBounce(bool _isBouncing, int _bounceAmount)
+    public void SetupBounce(bool _isBouncing, int _bounceAmount, float _bounceSpeed)
     {
         isBouncing = _isBouncing; // 设置是否可以反弹攻击
         bounceAmount = _bounceAmount; // 设置反弹次数
+        bounceSpeed = _bounceSpeed; // 设置反弹攻击的速度
 
         enemyTarget = new List<Transform>(); // 初始化目标敌人列表，如果是私有的，需要初始化列表
     }
@@ -139,7 +152,7 @@ public class Sword_Skill_Controller : MonoBehaviour
                     foreach (var hit in colliders)
                     {
                         if (hit.GetComponent<Enemy>() != null)
-                            hit.GetComponent<Enemy>().Damage(); // 对敌人造成伤害
+                            SwordSkillDamage(hit.GetComponent<Enemy>()); // 对目标敌人造成伤害
                     }
                 }
                 // Debug.Log("Spinning... " + spinTimer); // 打印旋转计时器信息
@@ -162,7 +175,7 @@ public class Sword_Skill_Controller : MonoBehaviour
 
             if (Vector2.Distance(transform.position, enemyTarget[targetIndex].position) < .1f)
             {
-                enemyTarget[targetIndex].GetComponent<Enemy>().Damage(); // 对目标敌人造成伤害
+                SwordSkillDamage(enemyTarget[targetIndex].GetComponent<Enemy>()); // 对目标敌人造成伤害
 
                 targetIndex++; // 移动到下一个目标
 
@@ -185,12 +198,24 @@ public class Sword_Skill_Controller : MonoBehaviour
         if (isReturning)
             return; // 如果正在返回玩家手中，则不处理碰撞
 
-        collision.GetComponent<Enemy>()?.Damage(); // 如果碰撞到敌人，则对敌人造成伤害
+
+        if (collision.GetComponent<Enemy>() != null) // 如果碰撞到敌人，则对敌人造成伤害
+        {
+            Enemy enemy = collision.GetComponent<Enemy>();
+
+            SwordSkillDamage(enemy);
+        }
 
         // 如果碰撞到敌人，则收集敌人位置并填充目标列表
         SetupTargetsForBounce(collision);
 
         StuckInto(collision);
+    }
+
+    private void SwordSkillDamage(Enemy enemy)
+    {
+        enemy.Damage();
+        enemy.StartCoroutine("FreezeTimeFor", freezeTimeDuration);
     }
 
     private void SetupTargetsForBounce(Collider2D collision)

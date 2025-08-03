@@ -16,7 +16,7 @@ public class Sword_Skill : Skill
     [Header("Bounce info")]
     [SerializeField] private int bounceAmount; // 反弹次数
     [SerializeField] private float bounceGravity; // 反弹时的重力
-
+    [SerializeField] private float bounceSpeed; // 反弹速度
 
     [Header("Pierce info")]
     [SerializeField] private int pierceAmount;
@@ -32,6 +32,8 @@ public class Sword_Skill : Skill
     [SerializeField] private GameObject swordPrefab; // 剑的预制体
     [SerializeField] private Vector2 launchForce; // 剑的发射方向
     [SerializeField] private float swordGravity; // 剑的重力
+    [SerializeField] private float freezeTimeDuration;// 冻结时间持续时间
+    [SerializeField] private float returnSpeed; // 返回玩家手中的速度
 
     private Vector2 finalDir; // 最终的发射方向
 
@@ -84,13 +86,13 @@ public class Sword_Skill : Skill
         Sword_Skill_Controller newSwordScript = newSword.GetComponent<Sword_Skill_Controller>();
 
         if (swordType == SwordType.Bounce)
-            newSwordScript.SetupBounce(true, bounceAmount); // 设置反弹技能
+            newSwordScript.SetupBounce(true, bounceAmount, bounceSpeed); // 设置反弹技能
         else if (swordType == SwordType.Pierce)
             newSwordScript.SetupPierce(pierceAmount);
         else if (swordType == SwordType.Spin)
             newSwordScript.SetupSpin(true, maxTravelDistance, spinDuration, hitCooldown);
 
-            newSwordScript.SetupSword(finalDir, swordGravity, player); // 设置剑的发射方向和重力
+        newSwordScript.SetupSword(finalDir, swordGravity, player, freezeTimeDuration, returnSpeed); // 设置剑的发射方向和重力
 
         player.AssignNewSword(newSword); // 将新剑分配给玩家
 
