@@ -34,8 +34,9 @@ public class Player : Entity
     public PlayerWallJumpState wallJumpState { get; private set; }
     public PlayerPrimaryAttackState primaryAttackState { get; private set; }
     public PlayerCounterAttackState counterAttackState { get; private set; } // 反击状态
-    public PlayerAimSwordState aimSwordState { get; private set; } // 瞄准剑状态（如果有的话）
-    public PlayerCatchSwordState catchSwordState { get; private set; } // 拿剑状态（如果有的话）
+    public PlayerAimSwordState aimSwordState { get; private set; } // 瞄准剑状态
+    public PlayerCatchSwordState catchSwordState { get; private set; } // 拿剑状态
+    public PlayerBlackholeState blackholeState { get; private set; } // 黑洞状态
 
     #endregion
 
@@ -53,8 +54,9 @@ public class Player : Entity
         wallJumpState = new PlayerWallJumpState(this, stateMachine, "Jump");
         primaryAttackState = new PlayerPrimaryAttackState(this, stateMachine, "Attack");
         counterAttackState = new PlayerCounterAttackState(this, stateMachine, "CounterAttack"); // 反击状态
-        aimSwordState = new PlayerAimSwordState(this, stateMachine, "AimSword"); // 瞄准剑状态（如果有的话）
-        catchSwordState = new PlayerCatchSwordState(this, stateMachine, "CatchSword"); // 拿剑状态（如果有的话）
+        aimSwordState = new PlayerAimSwordState(this, stateMachine, "AimSword"); // 瞄准剑状态
+        catchSwordState = new PlayerCatchSwordState(this, stateMachine, "CatchSword"); // 拿剑状态
+        blackholeState = new PlayerBlackholeState(this, stateMachine, "Jump"); // 黑洞状态，黑洞状态和跳跃状态使用同一个动画，因为黑洞状态是跳跃的变种
     }
 
     protected override void Start()

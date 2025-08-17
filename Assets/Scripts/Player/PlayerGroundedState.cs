@@ -21,6 +21,9 @@ public class PlayerGroundedState : PlayerState
     {
         base.Update();
 
+        if (Input.GetKeyDown(KeyCode.R))
+            stateMachine.ChangeState(player.blackholeState); // 按下R键，转换为黑洞状态
+
         if (Input.GetKeyDown(KeyCode.Mouse1) && HasNoSword()) // 如果按下鼠标右键且没有持剑，则转换为瞄准剑状态
             stateMachine.ChangeState(player.aimSwordState); // 因为在投掷剑时，才将玩家和剑进行分离，将给玩家赋予一个新的剑
 

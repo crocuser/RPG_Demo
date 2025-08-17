@@ -9,7 +9,7 @@ public class Entity : MonoBehaviour
     public Animator anim { get; private set; }
     public Rigidbody2D rb { get; private set; }
     public EnityFX fx { get; private set; }
-
+    public SpriteRenderer sr { get; private set; }
     #endregion
 
     [Header("Knockback info")]
@@ -37,9 +37,10 @@ public class Entity : MonoBehaviour
 
     protected virtual void Start()
     {
-        fx = GetComponentInChildren<EnityFX>(); // 获取子组件 EnityFX
+        sr = GetComponentInChildren<SpriteRenderer>(); // 获取子组件 SpriteRenderer
         anim = GetComponentInChildren<Animator>(); // 获取子组件 Animator
         rb = GetComponent<Rigidbody2D>();
+        fx = GetComponent<EnityFX>();
 
     }
 
@@ -114,4 +115,12 @@ public class Entity : MonoBehaviour
             Flip();
     }
     #endregion
+
+    public void MakeTransparent(bool _transparent)
+    {
+        if (_transparent)
+            sr.color = Color.clear; // 设置透明
+        else
+            sr.color = Color.white;
+    }
 }

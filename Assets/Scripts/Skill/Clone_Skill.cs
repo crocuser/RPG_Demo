@@ -8,10 +8,10 @@ public class Clone_Skill : Skill
     [Space]
     [SerializeField] private bool canAttack; // 是否拥有该技能
 
-    public void CreateClone(Transform _clonePosition, float _dashDir)
+    public void CreateClone(Transform _clonePosition, float _dashDir, Vector3 _offset)
     {
         GameObject newClone = Instantiate(clonePrefab);
 
-        newClone.GetComponent<Clone_Skill_Controller>().SetupClone(_clonePosition, cloneDuration, canAttack, _dashDir); // 设置克隆体的位置和其他属性
+        newClone.GetComponent<Clone_Skill_Controller>().SetupClone(_clonePosition, cloneDuration, canAttack, _dashDir, _offset); // 设置克隆体的位置和其他属性
     }
 }

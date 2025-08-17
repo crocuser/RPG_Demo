@@ -31,13 +31,13 @@ public class Clone_Skill_Controller : MonoBehaviour
         }
     }
 
-    public void SetupClone(Transform _newTransform,float _cloneDuration,bool _canAttack, float _dashDir)
+    public void SetupClone(Transform _newTransform, float _cloneDuration, bool _canAttack, float _dashDir, Vector3 _offset)
     {
-        if(_canAttack)
+        if (_canAttack)
         {
             anim.SetInteger("AttackNumber", Random.Range(1, 4)); // 随机设置攻击动画编号
         }
-        transform.position = _newTransform.position; // 设置克隆体的位置
+        transform.position = _newTransform.position + _offset; // 设置克隆体的位置
         cloneTimer = _cloneDuration; // 重置克隆体计时器
 
         FaceClosestTarget(_dashDir); // 面向最近的敌人
