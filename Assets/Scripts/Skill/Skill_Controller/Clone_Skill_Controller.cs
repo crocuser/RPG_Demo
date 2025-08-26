@@ -8,6 +8,7 @@ public class Clone_Skill_Controller : MonoBehaviour
     [SerializeField] private Transform attackCheck;
     [SerializeField] private float attackCheckRadius = .8f; // 攻击检测半径
     private Transform closestEnemy; // 最近的敌人
+    private bool facingRight; // 面向方向
 
     private float cloneTimer; // 克隆体计时器
 
@@ -31,7 +32,7 @@ public class Clone_Skill_Controller : MonoBehaviour
         }
     }
 
-    public void SetupClone(Transform _newTransform, float _cloneDuration, bool _canAttack, float _dashDir, Vector3 _offset, Transform _closestEnemy)
+    public void SetupClone(Transform _newTransform, float _cloneDuration, bool _canAttack, Vector3 _offset, Transform _closestEnemy, bool _facingRight)
     {
         if (_canAttack)
         {
@@ -41,7 +42,9 @@ public class Clone_Skill_Controller : MonoBehaviour
         cloneTimer = _cloneDuration; // 重置克隆体计时器
 
         closestEnemy = _closestEnemy; // 设置最近的敌人
-        FaceClosestTarget(_dashDir); // 面向最近的敌人
+        facingRight = _facingRight;
+        
+        FaceClosestTarget(); // 面向最近的敌人
     }
 
     private void AnimationTrigger()
@@ -59,7 +62,7 @@ public class Clone_Skill_Controller : MonoBehaviour
                 hit.GetComponent<Enemy>().Damage();
     }
 
-    private void FaceClosestTarget(float _dashDir)
+    private void FaceClosestTarget()
     {
         if (closestEnemy != null)
         {
@@ -67,7 +70,7 @@ public class Clone_Skill_Controller : MonoBehaviour
             if (transform.position.x > closestEnemy.position.x)
                 transform.Rotate(0, 180, 0);
         }
-        else if (_dashDir < 0)
+        else if (closestEnemy == null && !facingRight)
         {
             //Debug.Log("没有发现敌人");
             transform.Rotate(0, 180, 0); // 如果是向左冲刺，则旋转克隆体，默认是右侧

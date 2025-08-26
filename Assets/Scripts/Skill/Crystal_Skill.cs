@@ -1,4 +1,4 @@
-using NUnit.Framework;
+   using NUnit.Framework;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using UnityEngine;
@@ -8,6 +8,9 @@ public class Crystal_Skill : Skill
     [SerializeField] private float crystalDuration; // 水晶存在时间
     [SerializeField] private GameObject crystalPrefab; // 水晶预制体
     private GameObject currentCrystal;
+
+    [Header("Crystal mirage")]
+    [SerializeField] private bool cloneInsteadOfCrystal; // 是否是克隆体而不是传送
 
     [Header("Explosive crystal")]
     [SerializeField] private bool canExplode; // 是否可以爆炸
@@ -43,11 +46,18 @@ public class Crystal_Skill : Skill
                 return; // 如果水晶可以移动，则不允许再次使用技能的其他模式
 
             Vector2 playerPos = player.transform.position;
-
             player.transform.position = currentCrystal.transform.position; // 将玩家位置设置为水晶位置
-
             currentCrystal.transform.position = playerPos; // 将水晶位置设置为玩家位置
-            currentCrystal.GetComponent<Crystal_Skill_Controller>()?.FinishCrystal(); // 结束当前水晶
+
+            if (cloneInsteadOfCrystal)
+            {
+                SkillManager.instance.clone.CreateClone(currentCrystal.transform, Vector3.zero); // 创建克隆体
+                Destroy(currentCrystal); // 销毁水晶
+            }
+            else
+            {
+                currentCrystal.GetComponent<Crystal_Skill_Controller>()?.FinishCrystal(); // 结束当前水晶
+            }
         }
     }
 

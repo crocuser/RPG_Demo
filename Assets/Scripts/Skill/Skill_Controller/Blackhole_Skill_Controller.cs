@@ -104,22 +104,19 @@ public class Blackhole_Skill_Controller : MonoBehaviour
         {
             cloneAttackTimer = cloneAttackCooldown;
 
-            float cloneDir = 0f;
             float offsetX = 0f;
             if (Random.Range(0, 100) > 50)
             {
-                cloneDir = 2f; // 克隆体向右攻击
                 offsetX = 2f; // 偏移量向右
             }
             else
             {
-                cloneDir = -2f; // 克隆体向左攻击
                 offsetX = -2f; // 偏移量向左
             }
 
             int randomIndex = Random.Range(0, targets.Count); // 随机选择一个目标
 
-            SkillManager.instance.clone.CreateClone(targets[randomIndex], cloneDir, new Vector3(offsetX, 0)); // 创建克隆体攻击目标
+            SkillManager.instance.clone.CreateClone(targets[randomIndex], new Vector3(offsetX, 0)); // 创建克隆体攻击目标
 
             amountAttack--; // 减少攻击次数
 
