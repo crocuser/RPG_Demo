@@ -76,6 +76,8 @@ public class Player : Entity
 
         CheckForDashInput(); // 玩家在任何状态下都可以冲刺，这是合理的，因为冲刺是为了规避某些高伤害
 
+        if (Input.GetKeyDown(KeyCode.F))
+            skill.crystal.CanUseSkill();
     }
 
     public void AssignNewSword(GameObject _newSword)
