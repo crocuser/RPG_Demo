@@ -9,6 +9,10 @@ public class Clone_Skill_Controller : MonoBehaviour
     [SerializeField] private float attackCheckRadius = .8f; // 攻击检测半径
     private Transform closestEnemy; // 最近的敌人
     private bool facingRight; // 面向方向
+    private int facingDir = 1;
+
+    private bool canDuplicateClone; // 是否可以复制克隆体
+    private float chanceToDuplicate; // 复制克隆体的概率
 
     private float cloneTimer; // 克隆体计时器
 
@@ -32,7 +36,7 @@ public class Clone_Skill_Controller : MonoBehaviour
         }
     }
 
-    public void SetupClone(Transform _newTransform, float _cloneDuration, bool _canAttack, Vector3 _offset, Transform _closestEnemy, bool _facingRight)
+    public void SetupClone(Transform _newTransform, float _cloneDuration, bool _canAttack, Vector3 _offset, Transform _closestEnemy, bool _facingRight, bool _canDuplicateClone, float _chanceToDuplicate)
     {
         if (_canAttack)
         {
@@ -43,7 +47,9 @@ public class Clone_Skill_Controller : MonoBehaviour
 
         closestEnemy = _closestEnemy; // 设置最近的敌人
         facingRight = _facingRight;
-        
+        canDuplicateClone = _canDuplicateClone;
+        chanceToDuplicate = _chanceToDuplicate;
+
         FaceClosestTarget(); // 面向最近的敌人
     }
 
@@ -58,17 +64,33 @@ public class Clone_Skill_Controller : MonoBehaviour
         Collider2D[] colliders = Physics2D.OverlapCircleAll(attackCheck.position, attackCheckRadius);
 
         foreach (var hit in colliders)
+        {
             if (hit.GetComponent<Enemy>() != null)
+            {
                 hit.GetComponent<Enemy>().Damage();
+
+                if (canDuplicateClone)
+                {
+                    // 新的技能模式，克隆体有99%的概率生成一个新的克隆体
+                    if (Random.Range(0, 100) < chanceToDuplicate)
+                    {
+                        SkillManager.instance.clone.CreateClone(hit.transform, new Vector3(1.5f * facingDir, 0)); // 在敌人旁边生成一个新的克隆体
+                    }
+                }
+            }
+
+        }
     }
 
     private void FaceClosestTarget()
     {
         if (closestEnemy != null)
         {
-            //Debug.Log("Closest enemy found: " + closestEnemy.name);
             if (transform.position.x > closestEnemy.position.x)
+            {
+                facingDir = -1;
                 transform.Rotate(0, 180, 0);
+            }
         }
         else if (closestEnemy == null && !facingRight)
         {

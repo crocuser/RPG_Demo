@@ -6,10 +6,12 @@ public class Skill : MonoBehaviour
     protected float cooldownTimer; // 技能冷却计时器
 
     protected Player player;
+    protected LayerMask enemyLayer;
 
     protected virtual void Start()
     {
         player = PlayerManager.instance.player;
+        enemyLayer = LayerMask.GetMask("Enemy");
     }
 
     protected virtual void Update() // 嗯，注意Update首字母大写，以及Unity自带的方法是蓝色标识
@@ -37,7 +39,7 @@ public class Skill : MonoBehaviour
 
     protected virtual Transform FindClosestEnemy(Transform _checkTransform)
     {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(_checkTransform.position, 25); // 检测范围内的所有碰撞体
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(_checkTransform.position, 25, enemyLayer); // 检测范围内的所有碰撞体
 
         float closestDistance = Mathf.Infinity; // 初始化最近距离为无穷大
         Transform closestEnemy = null; // 初始化最近的敌人为null
@@ -47,11 +49,12 @@ public class Skill : MonoBehaviour
             if (hit.GetComponent<Enemy>() != null) // 如果碰撞体是敌人
             {
                 float distanceToEnemy = Vector2.Distance(_checkTransform.position, hit.transform.position); // 计算与克隆体的距离
-                if (distanceToEnemy < closestDistance) // 如果距离小于当前最近距离
+                if (distanceToEnemy <= closestDistance) // 如果距离小于当前最近距离
                 {
                     closestDistance = distanceToEnemy; // 更新最近距离
                     closestEnemy = hit.transform; // 更新最近的敌人
                 }
+                // Debug.Log("Found enemy: " + hit.name + " at distance: " + distanceToEnemy);
             }
         }
         return closestEnemy; // 返回最近的敌人

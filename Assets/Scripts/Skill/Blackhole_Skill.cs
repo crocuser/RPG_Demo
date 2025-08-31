@@ -52,4 +52,9 @@ public class Blackhole_Skill : Skill
         return false; // 黑洞技能未完成，不能退出状态
     }
 
+    public float GetBlackholeRadius()
+    {
+        return maxSize / 2;//因为半径是0.5，它的实际大小是半径乘规模，所以这里除以2
+    }
+
 }

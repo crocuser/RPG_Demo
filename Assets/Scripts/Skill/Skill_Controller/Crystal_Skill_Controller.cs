@@ -6,6 +6,7 @@ public class Crystal_Skill_Controller : MonoBehaviour
     private CircleCollider2D cd => GetComponent<CircleCollider2D>();
 
     private float crystalExistTimer;
+    [SerializeField] private LayerMask whatIsEnemy;
 
     private bool canExplode;
     private bool canMove;
@@ -23,6 +24,15 @@ public class Crystal_Skill_Controller : MonoBehaviour
         closestEnemy = _closestEnemy;
     }
 
+    public void ChooseRandomEnemy()
+    {
+        float radius = SkillManager.instance.blackhole.GetBlackholeRadius();
+
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, radius, whatIsEnemy);
+
+        if (colliders.Length > 0)
+            closestEnemy = colliders[Random.Range(0, colliders.Length)].transform;
+    }
     private void Update()
     {
         crystalExistTimer -= Time.deltaTime;
@@ -49,7 +59,7 @@ public class Crystal_Skill_Controller : MonoBehaviour
 
     private void AnimationExplodeEvent()
     {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, cd.radius);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, cd.radius, whatIsEnemy);
 
         foreach (var hit in colliders)
             if (hit.GetComponent<Enemy>() != null)

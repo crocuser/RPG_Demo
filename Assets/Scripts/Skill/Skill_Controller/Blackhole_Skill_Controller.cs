@@ -37,6 +37,9 @@ public class Blackhole_Skill_Controller : MonoBehaviour
 
         // It is QTE system enabled.
         blackholeTimer = _blackholeDuration;
+
+        if (SkillManager.instance.clone.crystalInsteadOfClone) // 如果是水晶技能，则不允许玩家消失
+            playerCanDisapear = false;
     }
 
     private void Update()
@@ -122,7 +125,7 @@ public class Blackhole_Skill_Controller : MonoBehaviour
 
             if (amountAttack <= 0)
             {
-                Invoke("FinishBlackholeAbillity", .35f); // 调用 FinishBlackholeAbillity 方法，延迟0.5秒，等待克隆攻击结束
+                Invoke("FinishBlackholeAbillity", .5f); // 调用 FinishBlackholeAbillity 方法，延迟0.5秒，等待克隆攻击结束
             }
         }
     }
