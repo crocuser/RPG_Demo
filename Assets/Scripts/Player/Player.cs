@@ -37,7 +37,7 @@ public class Player : Entity
     public PlayerAimSwordState aimSwordState { get; private set; } // 瞄准剑状态
     public PlayerCatchSwordState catchSwordState { get; private set; } // 拿剑状态
     public PlayerBlackholeState blackholeState { get; private set; } // 黑洞状态
-
+    public PlayerDeadState deadState { get; private set; }
     #endregion
 
     protected override void Awake()
@@ -57,6 +57,7 @@ public class Player : Entity
         aimSwordState = new PlayerAimSwordState(this, stateMachine, "AimSword"); // 瞄准剑状态
         catchSwordState = new PlayerCatchSwordState(this, stateMachine, "CatchSword"); // 拿剑状态
         blackholeState = new PlayerBlackholeState(this, stateMachine, "Jump"); // 黑洞状态，黑洞状态和跳跃状态使用同一个动画，因为黑洞状态是跳跃的变种
+        deadState = new PlayerDeadState(this, stateMachine, "Die");
     }
 
     protected override void Start()
@@ -121,5 +122,10 @@ public class Player : Entity
         }
     }
 
+    public override void Die()
+    {
+        base.Die();
 
+        stateMachine.ChangeState(deadState);
+    }
 }

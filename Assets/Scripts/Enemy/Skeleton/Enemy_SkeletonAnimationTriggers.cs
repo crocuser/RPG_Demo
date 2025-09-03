@@ -11,14 +11,19 @@ public class Enemy_SkeletonAnimationTriggers : MonoBehaviour
 
     private void AttackTrigger()
     {
-        // 收集攻击范围内的所有碰撞体
+        // 鏀堕泦鏀诲嚮鑼冨洿鍐呯殑鎵�鏈夌鎾炰綋
         Collider2D[] colliders = Physics2D.OverlapCircleAll(enemy.attackCheck.position, enemy.attackCheckRadius);
         foreach (var hit in colliders)
+        {
             if (hit.GetComponent<Player>() != null)
-                hit.GetComponent<Player>().Damage(); // 攻击玩家
+            {
+                PlayerStats target = hit.GetComponent<PlayerStats>();
+                enemy.stats.DoDamage(target); // 瀵圭帺瀹堕�犳垚浼ゅ
+            }
+        }
     }
 
-    private void OpenCounterWindow() => enemy.OpenCounterAttackWindow(); // 打开反击击晕敌人时的图像提示
-    private void CloseCounterWindow() => enemy.CloseCounterAttackWindow(); // 关闭反击击晕敌人时的图像提示
+    private void OpenCounterWindow() => enemy.OpenCounterAttackWindow(); // 鎵撳紑鍙嶅嚮鍑绘檿鏁屼汉鏃剁殑鍥惧儚鎻愮ず
+    private void CloseCounterWindow() => enemy.CloseCounterAttackWindow(); // 鍏抽棴鍙嶅嚮鍑绘檿鏁屼汉鏃剁殑鍥惧儚鎻愮ず
 
 }

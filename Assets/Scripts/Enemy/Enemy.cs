@@ -23,6 +23,7 @@ public class Enemy : Entity
     [HideInInspector] public float lastTimeAttacked; // 最后的攻击时间，隐藏掉
 
     public EnemyStateMachine stateMachine { get; private set; }
+    public string lastAnimBoolName { get; private set; }
 
     protected override void Awake()
     {
@@ -42,6 +43,10 @@ public class Enemy : Entity
         //    Debug.Log(rch.collider.gameObject.name + " I SEE");
     }
 
+    public virtual void AssignLastAnimName(string _animBoolName)
+    {
+        lastAnimBoolName = _animBoolName;
+    }
     public virtual void FreezeTime(bool _timeFrozen)
     {
         if (_timeFrozen)

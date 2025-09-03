@@ -7,7 +7,7 @@ public class EnemyState
     protected Rigidbody2D rb;
 
     protected bool triggerCalled;
-    private string animBoolName;
+    private string animBoolName; // 用于标识当前状态的动画布尔参数名称
 
     protected float stateTimer;
 
@@ -31,6 +31,7 @@ public class EnemyState
     public virtual void Exit() 
     {
         enemyBase.anim.SetBool(animBoolName, false);
+        enemyBase.AssignLastAnimName(animBoolName);
     }
 
     public virtual void AnimationFinishTrigger()
