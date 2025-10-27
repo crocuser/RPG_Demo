@@ -32,6 +32,9 @@ public class Entity : MonoBehaviour
     public int facingDir { get; private set; } = 1;
     public bool facingRight { get; private set; } = true;
 
+    public System.Action onFlipped; // 翻转时的回调事件
+
+
     protected virtual void Awake()
     {
 
@@ -108,6 +111,8 @@ public class Entity : MonoBehaviour
         facingDir = facingDir * -1;
         facingRight = !facingRight;
         transform.Rotate(0, 180, 0);
+
+        onFlipped?.Invoke(); // 触发翻转事件
     }
 
     public virtual void FlipController(float _x)
