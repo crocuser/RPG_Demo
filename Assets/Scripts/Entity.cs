@@ -55,6 +55,14 @@ public class Entity : MonoBehaviour
 
     }
 
+    public virtual void SlowEnityBy(float _slowPercentage, float _slowDuration) // 减速方法
+    {
+        // 留给子类实现
+    }
+    protected virtual void ReturnDefaultSpeed()
+    {
+        anim.speed = 1f; // 恢复默认速度
+    }
     public virtual void DamageEffect()
     {
         fx.StartCoroutine("FlashFX"); // 调用 EnityFX 中的闪烁特效协程

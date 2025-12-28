@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class CharacterStats : MonoBehaviour
 {
+    private EnityFX fx;
+
     [Header("Major stats")]
     public Stat strength; // 力量--暴击伤害
     public Stat agility; // 敏捷--闪避速度
@@ -29,15 +31,17 @@ public class CharacterStats : MonoBehaviour
     public bool isShocked; // 是否被电击，会减少闪避
 
     //造成魔法伤害，施加负面状态
-
+    [SerializeField] private float ailmentDuration = 4; // 负面状态持续时间
     private float igniteTimer; // 燃烧持续时间
     private float chillTimer; // 冰冻持续时间
-    private float shockTimer; // 点击持续时间
+    private float shockTimer; // 电击持续时间
 
 
     private float igniteDamageCooldown = .3f; // 每0.3掉血一次
     private float igniteDamageTimer; // 计时器
     private int igniteDamage; // 每次掉血值
+    [SerializeField] private GameObject shockStrikePrefab; // 闪电链预制体
+    private int shockDamage; // 闪电链伤害值
 
     public int currentHealth;
 
@@ -47,7 +51,9 @@ public class CharacterStats : MonoBehaviour
     {
         critPower.SetDefaultValue(150); // 默认暴击伤害150%
         currentHealth = GetMaxHealthValue();
-        Debug.Log("start character stats");
+        fx = GetComponent<EnityFX>();
+
+        //Debug.Log("start character stats");
     }
 
     protected virtual void Update()
@@ -157,11 +163,15 @@ public class CharacterStats : MonoBehaviour
         if (canApplyIgnite)
             _targetStats.SetupIgniteDamage(Mathf.RoundToInt(_fireDamage * .2f)); // 点燃每次掉血为火焰伤害的20%
 
+        if (canApplyShock)
+            _targetStats.SetupShockStrikeDamage(Mathf.RoundToInt(_lightningDamage * .5f)); // 闪电链伤害为闪电伤害的50%
+
         _targetStats.ApplyAilments(canApplyIgnite, canApplyChill, canApplyShock);
 
     }
 
     public void SetupIgniteDamage(int _damage) => igniteDamage = _damage;
+    public void SetupShockStrikeDamage(int _damage) => shockDamage = _damage;
     private static int CheckTargetResistance(CharacterStats _targetStats, int totalMagicDamage)
     {
         totalMagicDamage -= _targetStats.magicResistance.GetValue() + (_targetStats.intelligence.GetValue() * 3); // 智力也增魔抗（数值）
@@ -171,27 +181,93 @@ public class CharacterStats : MonoBehaviour
 
     public void ApplyAilments(bool _ignite, bool _chill, bool _shock)
     {
-        if (isIgnited || isChilled || isShocked)
-            return;// 不能叠加状态
+        //if (isIgnited || isChilled || isShocked)
+        //    return;// 不能叠加状态
+        bool canApplyIgnite = !isIgnited && !isChilled && !isShocked;
+        bool canApplyChill = !isIgnited && !isChilled && !isShocked;
+        bool canApplyShock = !isIgnited && !isChilled; // 电击状态可以叠加
 
-        if (_ignite)
+        if (_ignite && canApplyIgnite)
         {
             isIgnited = _ignite;
-            igniteTimer = 3f; // 点燃持续3秒
+            igniteTimer = ailmentDuration; // 点燃时间
+
+            fx.IgniteFxFor(ailmentDuration); // 触发点燃特效
         }
 
-        if (_chill)
+        if (_chill && canApplyChill)
         {
             isChilled = _chill;
-            chillTimer = 3f; // 冰冻持续3秒
+            chillTimer = ailmentDuration; // 冰冻时间
+
+            float slowPercentage = .5f;
+            GetComponent<Entity>().SlowEnityBy(slowPercentage, ailmentDuration); // 冰冻时减速
+
+            fx.ChillFxFor(ailmentDuration); // 触发冰冻特效
         }
 
-        if (_shock)
+        if (_shock && canApplyShock)
         {
-            isShocked = _shock;
-            shockTimer = 3f; // 电击持续3秒
+            if (!isShocked)
+            {
+                ApplyShock(_shock);
+            }
+            else
+            {
+                HitNearestTargetWithShockStrike(); // 已经被电击，则向最近的敌人释放一次闪电链
+
+            }
         }
     }
+
+    public void ApplyShock(bool _shock)
+    {
+        isShocked = _shock;
+        shockTimer = ailmentDuration; // 电击时间
+
+        fx.ShockFxFor(ailmentDuration); // 触发电击特效
+    }
+
+    private void HitNearestTargetWithShockStrike()
+    {
+        // 如果已经被电击，则向最近的敌人释放一次闪电链（由敌人自己出发下一次电击）
+        // 从目前效果来看时，处于电击中的敌人，再次受到闪电攻击，则给它进行了一次余电袭击
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 25); // 检测范围内的所有碰撞体
+
+        float closestDistance = Mathf.Infinity; // 初始化最近距离为无穷大
+        Transform closestEnemy = null; // 初始化最近的敌人为null
+
+        foreach (var hit in colliders)
+        {
+            if (GetComponent<Player>() != null)
+            {
+                closestEnemy = hit.GetComponent<Player>()?.transform; // 被攻击的玩家也会触发闪电链
+                break;
+            }
+
+            if (hit.GetComponent<Enemy>() != null && Vector2.Distance(transform.position, hit.transform.position) > 1) // 如果碰撞体是敌人
+            {
+                float distanceToEnemy = Vector2.Distance(transform.position, hit.transform.position); // 计算与克隆体的距离
+                if (distanceToEnemy <= closestDistance) // 如果距离小于当前最近距离
+                {
+                    closestDistance = distanceToEnemy; // 更新最近距离
+                    closestEnemy = hit.transform; // 更新最近的敌人
+                }
+
+            }
+
+        }
+        if (closestEnemy == null) // 如果没有找到其他敌人，就释放给自己
+            closestEnemy = transform;
+
+        if (closestEnemy != null)
+        {
+            // 释放闪电链
+            GameObject newShockStrike = Instantiate(shockStrikePrefab, transform.position, Quaternion.identity);
+            newShockStrike.GetComponent<ShockStrike_Controller>().Setup(shockDamage, closestEnemy.GetComponent<CharacterStats>());
+        }
+    }
+
     public virtual void TakeDamage(int _damage)
     {
         // 从敌人的角度，受到伤害

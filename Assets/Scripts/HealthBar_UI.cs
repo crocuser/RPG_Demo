@@ -18,7 +18,7 @@ public class HealthBar_UI : MonoBehaviour
         myStats.onHealthChanged += UpdateHealthUI;
 
         UpdateHealthUI();
-        Debug.Log("HealthBar_UI started");
+        //Debug.Log("HealthBar_UI started");
     }
 
     private void UpdateHealthUI()

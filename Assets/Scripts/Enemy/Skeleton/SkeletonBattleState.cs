@@ -52,6 +52,7 @@ public class SkeletonBattleState : EnemyState
 
         // 设置速度
         enemy.SetVelocity(enemy.moveSpeed * moveDir, rb.linearVelocity.y);
+
     }
 
 

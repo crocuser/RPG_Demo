@@ -13,10 +13,13 @@ public class Player : Entity
     public float moveSpeed = 10f;
     public float jumpForce = 12f;
     public float swordReturnImpact; // 剑返回冲击力
+    private float defaultMoveSpeed; // 默认移动速度
+    private float defaultJumpForce; // 默认跳跃力
 
     [Header("Dash info")]
     public float dashSpeed = 28f;
     public float dashDuration = 0.2f;
+    private float defaultDashSpeed;
     public float dashDir { get; private set; } // 为什么不是int
 
     public SkillManager skill { get; private set; }
@@ -68,6 +71,9 @@ public class Player : Entity
 
         stateMachine.Initialize(idleState); // 初始化状态机
 
+        defaultMoveSpeed = moveSpeed;
+        defaultJumpForce = jumpForce;
+        defaultDashSpeed = dashSpeed;
     }
 
     protected override void Update()
@@ -81,6 +87,24 @@ public class Player : Entity
             skill.crystal.CanUseSkill();
     }
 
+    public override void SlowEnityBy(float _slowPercentage, float _slowDuration)
+    {
+        moveSpeed = moveSpeed * (1 - _slowPercentage);
+        jumpForce = jumpForce * (1 - _slowPercentage);
+        dashSpeed = dashSpeed * (1 - _slowPercentage);
+        anim.speed = anim.speed * (1 - _slowPercentage);
+
+        Invoke("ReturnDefaultSpeed", _slowDuration); // 在指定时间后恢复默认速度
+    }
+
+    protected override void ReturnDefaultSpeed()
+    {
+        base.ReturnDefaultSpeed();
+
+        moveSpeed = defaultMoveSpeed;
+        jumpForce = defaultJumpForce;
+        dashSpeed = defaultDashSpeed;
+    }
     public void AssignNewSword(GameObject _newSword)
     {
         sword = _newSword; // 分配新的剑

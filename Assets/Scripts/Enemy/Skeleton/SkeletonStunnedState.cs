@@ -12,7 +12,7 @@ public class SkeletonStunnedState : EnemyState
     {
         base.Enter();
 
-        // ¶¨Ê±ÖØ¸´µ÷ÓÃ£ºInvokeRepeating("·½·¨Ãû", ³õÊ¼ÑÓ³Ù, µ÷ÓÃ¼ä¸ô);
+        // å®šæ—¶é‡å¤è°ƒç”¨ï¼šInvokeRepeating("æ–¹æ³•å", åˆå§‹å»¶è¿Ÿ, è°ƒç”¨é—´éš”);
         enemy.fx.InvokeRepeating("RedColorBlink", 0, .1f);
 
         stateTimer = enemy.stunnedDuration;
@@ -24,7 +24,7 @@ public class SkeletonStunnedState : EnemyState
     {
         base.Exit();
 
-        enemy.fx.Invoke("CancelRedBlink", 0); // È¡ÏûÑ£ÔÎÊ±µÄºìÉ«ÉÁË¸Ğ§¹û
+        enemy.fx.Invoke("CancelColorChange", 0); // å–æ¶ˆçœ©æ™•æ—¶çš„çº¢è‰²é—ªçƒæ•ˆæœ
     }
 
     public override void Update()
@@ -32,6 +32,6 @@ public class SkeletonStunnedState : EnemyState
         base.Update();
 
         if (stateTimer < 0)
-            enemy.stateMachine.ChangeState(enemy.idleState); // Ñ£ÔÎ½áÊø£¬»Øµ½idle×´Ì¬
+            enemy.stateMachine.ChangeState(enemy.idleState); // çœ©æ™•ç»“æŸï¼Œå›åˆ°idleçŠ¶æ€
     }
 }
