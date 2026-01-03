@@ -77,7 +77,7 @@ public class Blackhole_Skill_Controller : MonoBehaviour
             if (transform.localScale.x < 0)
             {
                 Destroy(gameObject);
-                PlayerManager.instance.player.MakeTransparent(false);
+                PlayerManager.instance.player.fx.MakeTransparent(false);
             }
         }
     }
@@ -97,7 +97,7 @@ public class Blackhole_Skill_Controller : MonoBehaviour
         if (playerCanDisapear)
         {
             playerCanDisapear = false; // 禁止玩家消失
-            PlayerManager.instance.player.MakeTransparent(true); // 使玩家透明，表示技能正在释放
+            PlayerManager.instance.player.fx.MakeTransparent(true); // 使玩家透明，表示技能正在释放
         }
     }
 

@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class Clone_Skill_Controller : MonoBehaviour
 {
+    private Player player;
     private SpriteRenderer sr;
     private Animator anim;
     [SerializeField] private float colorLosingSpeed; // 克隆体颜色消失速度
@@ -36,7 +37,7 @@ public class Clone_Skill_Controller : MonoBehaviour
         }
     }
 
-    public void SetupClone(Transform _newTransform, float _cloneDuration, bool _canAttack, Vector3 _offset, Transform _closestEnemy, bool _facingRight, bool _canDuplicateClone, float _chanceToDuplicate)
+    public void SetupClone(Transform _newTransform, float _cloneDuration, bool _canAttack, Vector3 _offset, Transform _closestEnemy, bool _facingRight, bool _canDuplicateClone, float _chanceToDuplicate, Player _player)
     {
         if (_canAttack)
         {
@@ -50,6 +51,7 @@ public class Clone_Skill_Controller : MonoBehaviour
         canDuplicateClone = _canDuplicateClone;
         chanceToDuplicate = _chanceToDuplicate;
 
+        player = _player;
         FaceClosestTarget(); // 面向最近的敌人
     }
 
@@ -67,7 +69,8 @@ public class Clone_Skill_Controller : MonoBehaviour
         {
             if (hit.GetComponent<Enemy>() != null)
             {
-                hit.GetComponent<Enemy>().DamageEffect();
+                //hit.GetComponent<Enemy>().DamageImpact();//在enemy脚本里处理
+                player.stats.DoDamage(hit.GetComponent<CharacterStats>());
 
                 if (canDuplicateClone)
                 {

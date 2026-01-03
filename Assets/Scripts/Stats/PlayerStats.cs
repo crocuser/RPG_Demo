@@ -14,7 +14,7 @@ public class PlayerStats : CharacterStats
     {
         base.TakeDamage(_damage);
 
-        player.DamageEffect();
+        //player.DamageImpact(); // 已抽象到 CharacterStats
     }
 
     protected override void Die()

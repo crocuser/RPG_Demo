@@ -21,6 +21,14 @@ public class EnityFX : MonoBehaviour
         originalMat = sr.material; // 获取保存原始材质
     }
 
+    public void MakeTransparent(bool _transparent)
+    {
+        if (_transparent)
+            sr.color = Color.clear; // 设置透明
+        else
+            sr.color = Color.white;
+    }
+
     private IEnumerator FlashFX()
     {
         sr.material = hitMat; // 设置为闪烁材质

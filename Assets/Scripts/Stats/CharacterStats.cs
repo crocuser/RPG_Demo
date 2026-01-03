@@ -46,6 +46,7 @@ public class CharacterStats : MonoBehaviour
     public int currentHealth;
 
     public System.Action onHealthChanged;
+    protected bool isDead = false;
 
     protected virtual void Start()
     {
@@ -73,29 +74,19 @@ public class CharacterStats : MonoBehaviour
         if (shockTimer < 0)
             isShocked = false;
 
-        if (igniteDamageTimer < 0 && isIgnited)
-        {
-            //Debug.Log("Take burn damage: " + igniteDamage);
-
-            DecreaseHealthBy(igniteDamage); // 持续掉血，调用UI更新生命值
-
-            if (currentHealth <= 0)
-            { 
-                Die();
-            }
-
-            igniteDamageTimer = igniteDamageCooldown;
-        }
+        if (isIgnited)
+            ApplyIgniteDamage();
     }
+
 
     public virtual void DoDamage(CharacterStats _targetStats)
     {
-        if (TargetCanAvoidAttack(_targetStats))
+        if (TargetCanAvoidAttack(_targetStats)) // 目标闪避成功
             return;
 
-        //DoPhysicalDamage(_targetStats);
+        DoPhysicalDamage(_targetStats);
 
-        DoMagicDamage(_targetStats);
+        //DoMagicDamage(_targetStats);
 
     }
 
@@ -114,6 +105,7 @@ public class CharacterStats : MonoBehaviour
         _targetStats.TakeDamage(totalPhysicalDamage);
     }
 
+    #region Magical damage and ailements
     public virtual void DoMagicDamage(CharacterStats _targetStats)
     {
         int _fireDamage = fireDamage.GetValue();
@@ -131,6 +123,16 @@ public class CharacterStats : MonoBehaviour
         if (Mathf.Max(_fireDamage, _iceDamage, _lightningDamage) <= 0)
             return; // 如果没有任何魔法伤害，就不施加状态
 
+        bool flowControl = AttemptToApplyAilement(_targetStats, _fireDamage, _iceDamage, _lightningDamage);
+        if (!flowControl) // 未成功施加状态
+        {
+            return;
+        }
+
+    }
+
+    private bool AttemptToApplyAilement(CharacterStats _targetStats, int _fireDamage, int _iceDamage, int _lightningDamage)
+    {
         bool canApplyIgnite = _fireDamage > _iceDamage && _fireDamage > _lightningDamage;
         bool canApplyChill = _iceDamage > _fireDamage && _iceDamage > _lightningDamage;
         bool canApplyShock = _lightningDamage > _fireDamage && _lightningDamage > _iceDamage;
@@ -142,21 +144,21 @@ public class CharacterStats : MonoBehaviour
                 canApplyIgnite = true;
                 _targetStats.ApplyAilments(canApplyIgnite, canApplyChill, canApplyShock);
                 //Debug.Log("点燃");
-                return;
+                return false;
             }
             if (Random.value < .5f && _iceDamage > 0)
             {
                 canApplyChill = true;
                 _targetStats.ApplyAilments(canApplyIgnite, canApplyChill, canApplyShock);
                 //Debug.Log("冰冻");
-                return;
+                return false;
             }
             if (Random.value < 1f && _lightningDamage > 0)
             {
                 canApplyShock = true;
                 _targetStats.ApplyAilments(canApplyIgnite, canApplyChill, canApplyShock);
                 //Debug.Log("电击");
-                return;
+                return false;
             }
         }
 
@@ -167,17 +169,11 @@ public class CharacterStats : MonoBehaviour
             _targetStats.SetupShockStrikeDamage(Mathf.RoundToInt(_lightningDamage * .5f)); // 闪电链伤害为闪电伤害的50%
 
         _targetStats.ApplyAilments(canApplyIgnite, canApplyChill, canApplyShock);
-
+        return true;
     }
 
     public void SetupIgniteDamage(int _damage) => igniteDamage = _damage;
     public void SetupShockStrikeDamage(int _damage) => shockDamage = _damage;
-    private static int CheckTargetResistance(CharacterStats _targetStats, int totalMagicDamage)
-    {
-        totalMagicDamage -= _targetStats.magicResistance.GetValue() + (_targetStats.intelligence.GetValue() * 3); // 智力也增魔抗（数值）
-        totalMagicDamage = Mathf.Clamp(totalMagicDamage, 0, int.MaxValue); // 确保伤害不为负数
-        return totalMagicDamage;
-    }
 
     public void ApplyAilments(bool _ignite, bool _chill, bool _shock)
     {
@@ -220,6 +216,22 @@ public class CharacterStats : MonoBehaviour
         }
     }
 
+    private void ApplyIgniteDamage()
+    {
+        if (igniteDamageTimer < 0)
+        {
+            //Debug.Log("Take burn damage: " + igniteDamage);
+
+            DecreaseHealthBy(igniteDamage); // 持续掉血，调用UI更新生命值
+
+            if (currentHealth <= 0 && !isDead)
+            {
+                Die();
+            }
+
+            igniteDamageTimer = igniteDamageCooldown;
+        }
+    }
     public void ApplyShock(bool _shock)
     {
         isShocked = _shock;
@@ -267,13 +279,16 @@ public class CharacterStats : MonoBehaviour
             newShockStrike.GetComponent<ShockStrike_Controller>().Setup(shockDamage, closestEnemy.GetComponent<CharacterStats>());
         }
     }
-
+    #endregion
     public virtual void TakeDamage(int _damage)
     {
         // 从敌人的角度，受到伤害
         DecreaseHealthBy(_damage);
 
-        if (currentHealth <= 0)
+        GetComponent<Entity>().DamageImpact(); // 调用 Entity 中的受击反馈方法
+        fx.StartCoroutine("FlashFX"); // 调用 EnityFX 中的闪烁特效协程
+
+        if (currentHealth <= 0 && !isDead)
         {
             Die();
         }
@@ -287,8 +302,10 @@ public class CharacterStats : MonoBehaviour
     }
     protected virtual void Die()
     {
-
+        isDead = true;
     }
+
+    #region Stat calculations
     private int CheckTargetArmor(CharacterStats _targetStats, int totalDamage)
     {
         if (_targetStats.isChilled)
@@ -298,6 +315,12 @@ public class CharacterStats : MonoBehaviour
 
         totalDamage = Mathf.Clamp(totalDamage, 0, int.MaxValue); // 确保伤害不为负数
         return totalDamage;
+    }
+    private int CheckTargetResistance(CharacterStats _targetStats, int totalMagicDamage)
+    {
+        totalMagicDamage -= _targetStats.magicResistance.GetValue() + (_targetStats.intelligence.GetValue() * 3); // 智力也增魔抗（数值）
+        totalMagicDamage = Mathf.Clamp(totalMagicDamage, 0, int.MaxValue); // 确保伤害不为负数
+        return totalMagicDamage;
     }
     private bool TargetCanAvoidAttack(CharacterStats _targetStats)
     {
@@ -340,4 +363,5 @@ public class CharacterStats : MonoBehaviour
     {
         return maxHealth.GetValue() + vitality.GetValue() * 5;
     }
+    #endregion
 }

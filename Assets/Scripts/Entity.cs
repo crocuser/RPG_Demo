@@ -4,7 +4,7 @@ using UnityEngine;
 public class Entity : MonoBehaviour
 {
 
-    //#region 是 C# 的预处理指令，用于在代码中定义一个可折叠的区域，方便代码组织。ctrl+k;ctrl+s
+    //#region 是 C# 的预处理指令，用于在代码中定义一个可折叠的区域，方便代码组织。快捷键ctrl+k;ctrl+s
     #region Components
     public Animator anim { get; private set; }
     public Rigidbody2D rb { get; private set; }
@@ -63,9 +63,8 @@ public class Entity : MonoBehaviour
     {
         anim.speed = 1f; // 恢复默认速度
     }
-    public virtual void DamageEffect()
+    public virtual void DamageImpact()
     {
-        fx.StartCoroutine("FlashFX"); // 调用 EnityFX 中的闪烁特效协程
         StartCoroutine("HitKnockback"); // 调用击退协程
         //Debug.Log(gameObject.name + " is damaged!");
     }
@@ -132,13 +131,6 @@ public class Entity : MonoBehaviour
     }
     #endregion
 
-    public void MakeTransparent(bool _transparent)
-    {
-        if (_transparent)
-            sr.color = Color.clear; // 设置透明
-        else
-            sr.color = Color.white;
-    }
 
     public virtual void Die()
     {
