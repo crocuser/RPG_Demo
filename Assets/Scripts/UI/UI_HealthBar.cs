@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HealthBar_UI : MonoBehaviour
+public class UI_HealthBar : MonoBehaviour
 {
     private Entity entity;
     private RectTransform myTransform;
@@ -18,7 +18,7 @@ public class HealthBar_UI : MonoBehaviour
         myStats.onHealthChanged += UpdateHealthUI;
 
         UpdateHealthUI();
-        //Debug.Log("HealthBar_UI started");
+        //Debug.Log("UI_HealthBar started");
     }
 
     private void UpdateHealthUI()
