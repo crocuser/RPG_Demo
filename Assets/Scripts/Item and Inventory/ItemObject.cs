@@ -6,7 +6,7 @@ public class ItemObject : MonoBehaviour
 
     [SerializeField] private ItemData itemData;
 
-    private void OnValidate()
+    private void OnValidate() // 在编辑器中修改脚本属性时调用
     {
         GetComponent<SpriteRenderer>().sprite = itemData.icon;
         gameObject.name = "item object - " + itemData.itemName;
