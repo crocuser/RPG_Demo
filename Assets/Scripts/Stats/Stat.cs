@@ -4,9 +4,9 @@ using System.Collections.Generic;
 [System.Serializable]
 public class Stat
 {
-    [SerializeField] private int baseValue;
+    [SerializeField] private int baseValue; // 基础值
 
-    public List<int> modifiers;
+    public List<int> modifiers; // 存储所有的修正值
     public int GetValue()
     {
         int finalValue = baseValue;
