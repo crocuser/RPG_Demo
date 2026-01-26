@@ -20,7 +20,7 @@ public class UI_ItemSlot : MonoBehaviour , IPointerDownHandler
         {
             itemImage.sprite = item.data.icon;
 
-            if (item.stackSize > 1)
+            if (item.stackSize >= 1)
             {
                 itemText.text = item.stackSize.ToString();
             }
@@ -38,7 +38,7 @@ public class UI_ItemSlot : MonoBehaviour , IPointerDownHandler
         itemImage.color = new Color(1, 1, 1, 0); // 透明
         itemText.text = "";
     }
-    public void OnPointerDown(PointerEventData eventData)
+    public virtual void OnPointerDown(PointerEventData eventData)
     {
         if (item.data.itemType == ItemType.Equipment)
             Inventory.instance.EquipItem(item.data);

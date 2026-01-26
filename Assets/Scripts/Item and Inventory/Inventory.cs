@@ -82,7 +82,7 @@ public class Inventory : MonoBehaviour
         UpdateSlotUI();
     }
 
-    private void UnequipItem(ItemData_Equipment itemToRemove)
+    public void UnequipItem(ItemData_Equipment itemToRemove)
     {
         if (equipmentDictionary.TryGetValue(itemToRemove, out InventoryItem value))
         {
@@ -198,6 +198,47 @@ public class Inventory : MonoBehaviour
         }
 
         UpdateSlotUI();
+    }
+
+    public bool CanCraft(ItemData_Equipment _itemToCraft, List<InventoryItem> _requiredMaterials)
+    {
+        List<InventoryItem> materialsToUsed = new List<InventoryItem>();
+
+        for (int i = 0; i < _requiredMaterials.Count; i++) // 遍历所需材料
+        {
+            if (stashDictionary.TryGetValue(_requiredMaterials[i].data, out InventoryItem stashValue))
+            {
+                // 检查材料数量是否足够
+                if (stashValue.stackSize < _requiredMaterials[i].stackSize)
+                {
+                    Debug.Log("Not enough materials to craft " + _itemToCraft.itemName);
+                    return false;
+                }
+                else
+                {
+                    materialsToUsed.Add(_requiredMaterials[i]);
+                }
+            }
+            else 
+            {
+                // 材料不存在于储藏中
+                Debug.Log("Missing materials to craft " + _itemToCraft.itemName);
+                return false;
+            }
+        }
+
+        for (int i = 0; i < materialsToUsed.Count; i++)
+        {
+            // 使用材料
+            for (int j = 0; j < materialsToUsed[i].stackSize; j++)
+                RemoveItem(materialsToUsed[i].data);
+        }
+
+        // 制作物品
+        AddItem(_itemToCraft);
+        Debug.Log("Crafted " + _itemToCraft.itemName);
+
+        return true;
     }
 
     //private void Update()

@@ -1,3 +1,5 @@
+using NUnit.Framework;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum EquipmentType
@@ -36,6 +38,8 @@ public class ItemData_Equipment : ItemData
     public int iceDamage; // 冰霜伤害
     public int lightningDamage; // 闪电伤害
 
+    [Header("Craft requirements")]
+    public List<InventoryItem> craftingMaterials; // 合成材料
     public void AddModifiers()
     {
         PlayerStats playerStats = PlayerManager.instance.player.GetComponent<PlayerStats>();
