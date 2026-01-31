@@ -26,5 +26,8 @@ public class PlayerDeadState : PlayerState
         base.Update();
 
         player.SetZeroVelocity();
+
+        Collider2D playerCollider = player.GetComponent<Collider2D>();
+
     }
 }

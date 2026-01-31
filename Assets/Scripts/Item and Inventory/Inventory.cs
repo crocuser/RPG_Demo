@@ -1,10 +1,13 @@
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Inventory : MonoBehaviour
 {
     public static Inventory instance;
+
+    public List<ItemData> startingItems; // 初始装备列表
 
     public List<InventoryItem> equipmentItems; // 装备实例列表
     public Dictionary<ItemData_Equipment, InventoryItem> equipmentDictionary; // 装备数据到装备实例的映射
@@ -47,6 +50,16 @@ public class Inventory : MonoBehaviour
         inventoryItemSlot = inventorySlotParent.GetComponentsInChildren<UI_ItemSlot>(); // 获取所有物品槽组件
         stashItemSlot = stashSlotParent.GetComponentsInChildren<UI_ItemSlot>(); // 获取所有储藏槽组件
         equipmentSlot = equipmentSlotParent.GetComponentsInChildren<UI_EquipmentSlot>(); // 获取所有装备槽组件
+
+        AddStartingItems();
+    }
+
+    private void AddStartingItems()
+    {
+        for (int i = 0; i < startingItems.Count; i++)
+        {
+            AddItem(startingItems[i]);
+        }
     }
 
     public void EquipItem(ItemData _item)
@@ -82,13 +95,33 @@ public class Inventory : MonoBehaviour
         UpdateSlotUI();
     }
 
-    public void UnequipItem(ItemData_Equipment itemToRemove)
+    public void UnequipItem(ItemData_Equipment itemToRemove, bool isDeadDrop = false)
     {
         if (equipmentDictionary.TryGetValue(itemToRemove, out InventoryItem value))
         {
+            if (isDeadDrop)
+            {
+                PlayerDeadDrop();
+                Debug.Log("死亡爆装备");
+            }
             equipmentItems.Remove(value);
             equipmentDictionary.Remove(itemToRemove);
             itemToRemove.RemoveModifiers(); // 移除属性加成
+            
+        }
+    }
+
+    private void PlayerDeadDrop()
+    {
+        for (int i = 0; i < equipmentSlot.Length; i++)
+        {
+            foreach (KeyValuePair<ItemData_Equipment, InventoryItem> item in equipmentDictionary)
+            {
+                if (item.Key.equipmentType == equipmentSlot[i].slotType)
+                {
+                    equipmentSlot[i].ClearSlot();
+                }
+            }
         }
     }
 
@@ -241,13 +274,7 @@ public class Inventory : MonoBehaviour
         return true;
     }
 
-    //private void Update()
-    //{
-    //    if (Input.GetKeyDown(KeyCode.L))
-    //    {
-    //        ItemData newItem = inventoryItems[inventoryItems.Count - 1].data;
-            
-    //        RemoveItem(newItem);
-    //    }
-    //}
+    public List<InventoryItem> GetEquipment() => equipmentItems;
+    public List<InventoryItem> GetInventory() => stashItems;
+
 }

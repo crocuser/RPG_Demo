@@ -92,7 +92,7 @@ MonoBehaviour:
   itemImage: {fileID: 7875180626733275618}
   itemText: {fileID: 3909753185262649157}
   item:
-    data: {fileID: 11400000, guid: cb05c14c351e2f94b886faf89250eb61, type: 2}
+    data: {fileID: 0}
     stackSize: 0
 --- !u!1 &2348041781680652534
 GameObject:
