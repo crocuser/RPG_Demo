@@ -11,7 +11,7 @@ public class PlayerItemDrop : ItemDrop
     {
         Inventory inventory = Inventory.instance;
 
-        List<InventoryItem> currentEquipment = new List<InventoryItem>(inventory.GetEquipment());
+        List<InventoryItem> currentEquipment = new List<InventoryItem>(inventory.GetEquipmentList());
         List<InventoryItem> currentStash = new List<InventoryItem>(inventory.stashItems);
 
         for (int i = 0; i < currentEquipment.Count; i++)

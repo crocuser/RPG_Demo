@@ -116,7 +116,7 @@ public class CharacterStats : MonoBehaviour
 
         totalMagicDamage = CheckTargetResistance(_targetStats, totalMagicDamage);
 
-        //Debug.Log("魔法伤害：" + totalMagicDamage);
+        Debug.Log("魔法伤害：" + totalMagicDamage);
         _targetStats.TakeDamage(totalMagicDamage);
 
 

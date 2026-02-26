@@ -15,6 +15,8 @@ public class ItemData_Equipment : ItemData
 {
     public EquipmentType equipmentType;
 
+    public ItemEffect[] itemEffects;
+
     // 直接复制 CharacterStats 里的属性
     [Header("Major stats")]
     public int strength; // 力量--暴击伤害
@@ -40,6 +42,14 @@ public class ItemData_Equipment : ItemData
 
     [Header("Craft requirements")]
     public List<InventoryItem> craftingMaterials; // 合成材料
+
+    public void ExecuteItemEffect(Transform _enemyPosiition)
+    {
+        foreach (ItemEffect effect in itemEffects)
+        {
+            effect.ExecuteEffect(_enemyPosiition);
+        }
+    }
     public void AddModifiers()
     {
         PlayerStats playerStats = PlayerManager.instance.player.GetComponent<PlayerStats>();

@@ -3,10 +3,10 @@ using UnityEngine;
 public class PlayerPrimaryAttackState : PlayerState
 {
 
-    private int comboCounter; // Á¬»÷´ÎÊı
+    public int comboCounter { get; private set; } // è¿å‡»æ¬¡æ•°
 
-    private float lastTimeAttacked; // ×îºó¹¥»÷µÄÊ±¼ä
-    private float comboWindow = 1; // Á¬»÷µÄÊ±¼ä¼ä¸ô
+    private float lastTimeAttacked; // æœ€åæ”»å‡»çš„æ—¶é—´
+    private float comboWindow = 1; // è¿å‡»çš„æ—¶é—´é—´éš”
     public PlayerPrimaryAttackState(Player _player, PlayerStateMachine _stateMachine, string _animBoolName) : base(_player, _stateMachine, _animBoolName)
     {
 
@@ -17,21 +17,21 @@ public class PlayerPrimaryAttackState : PlayerState
         base.Enter();
         xInput = 0;
 
-        // ÖØÖÃÁ¬»÷´ÎÊı
+        // é‡ç½®è¿å‡»æ¬¡æ•°
         if (comboCounter > 2 || Time.time >= lastTimeAttacked + comboWindow)
             comboCounter = 0;
 
-        player.anim.SetInteger("ComboCounter", comboCounter); // °ó¶¨¼ÆÊıÆ÷
+        player.anim.SetInteger("ComboCounter", comboCounter); // ç»‘å®šè®¡æ•°å™¨
 
-        // ¼ÇÂ¼Íæ¼ÒÊäÈëµÄ¹¥»÷·½Ïò
+        // è®°å½•ç©å®¶è¾“å…¥çš„æ”»å‡»æ–¹å‘
         float attackDir = player.facingDir;
 
         if (xInput != 0)
             attackDir = xInput;
 
-        player.SetVelocity(player.attackMovement[comboCounter].x * attackDir, player.attackMovement[comboCounter].y +rb.linearVelocity.y); // ¹¥»÷Ê±¸øÓèËÙ¶È£¬¾ø¶Ô¿ØÖÆ£¬¿ØÖÆÍ££¬¿ØÖÆÎ»ÒÆ
+        player.SetVelocity(player.attackMovement[comboCounter].x * attackDir, player.attackMovement[comboCounter].y +rb.linearVelocity.y); // æ”»å‡»æ—¶ç»™äºˆé€Ÿåº¦ï¼Œç»å¯¹æ§åˆ¶ï¼Œæ§åˆ¶åœï¼Œæ§åˆ¶ä½ç§»
 
-        stateTimer = .1f; // ÓĞÒ»µã¹ßĞÔ
+        stateTimer = .1f; // æœ‰ä¸€ç‚¹æƒ¯æ€§
 
         //player.anim.speed = 3f;
     }
@@ -40,7 +40,7 @@ public class PlayerPrimaryAttackState : PlayerState
     {
         base.Exit();
 
-        player.StartCoroutine("BusyFor", .15f); // ¹¥»÷ºóÒ¡
+        player.StartCoroutine("BusyFor", .15f); // æ”»å‡»åæ‘‡
 
         comboCounter++;
         lastTimeAttacked = Time.time;
@@ -53,9 +53,9 @@ public class PlayerPrimaryAttackState : PlayerState
         base.Update();
 
         if (stateTimer < 0)
-            player.SetZeroVelocity(); // ½â¾ö»¬²½ÎÊÌâ
+            player.SetZeroVelocity(); // è§£å†³æ»‘æ­¥é—®é¢˜
 
-        // ½áÊø¶¯»­´¥·¢£¬½øÈë¿ÕÏĞ×´Ì¬
+        // ç»“æŸåŠ¨ç”»è§¦å‘ï¼Œè¿›å…¥ç©ºé—²çŠ¶æ€
         if (triggerCalled)
             stateMachine.ChangeState(player.idleState);
     }
