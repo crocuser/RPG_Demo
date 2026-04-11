@@ -9,8 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 889038e953dce8d4699122035b28310c, type: 3}
-  m_Name: Ice And Fire effect
+  m_Script: {fileID: 11500000, guid: fcf757ade1989014dba70a052677974d, type: 3}
+  m_Name: Heal on hit
   m_EditorClassIdentifier: 
-  iceAndFirePrefab: {fileID: 1609911291463383011, guid: ebf34051d709b5a418891ec6e973f461, type: 3}
-  xVelocity: 10
+  healPercent: 0.1

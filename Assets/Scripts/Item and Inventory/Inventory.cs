@@ -27,6 +27,10 @@ public class Inventory : MonoBehaviour
     private UI_ItemSlot[] stashItemSlot; // 储藏槽数组
     private UI_EquipmentSlot[] equipmentSlot; // 装备槽数组
 
+    [Header("Items cooldown")]
+    private float lastTimeUsedFlask = -Mathf.Infinity; // 上次使用药水的时间，初始值为负无穷，确保第一次使用时不会受到冷却限制
+    private float lastTimeUsedArmor = -Mathf.Infinity; // 上次使用盔甲的时间，初始值为负无穷，确保第一次使用时不会受到冷却限制
+
     private void Awake()
     {
         // 单例模式：没有则创建，有则销毁多余实例
@@ -288,4 +292,51 @@ public class Inventory : MonoBehaviour
         return null;
     }
 
+    public void UseFlask()
+    {
+        ItemData_Equipment currentFlask = GetEquipment(EquipmentType.Flask);
+
+        if (currentFlask != null)
+        {
+            if (Time.time - lastTimeUsedFlask >= currentFlask.itemCooldown)
+            {
+                currentFlask.ExecuteItemEffect(null); // 执行药水效果
+                lastTimeUsedFlask = Time.time; // 更新上次使用时间
+            }
+            else
+            {
+                Debug.Log("Flask is on cooldown. Please wait.");
+            }
+        }
+        else
+        {
+            Debug.Log("No flask equipped.");
+        }
+    }
+
+    public bool CanUseArmor()
+    {
+        PlayerStats playerStats = PlayerManager.instance.player.GetComponent<PlayerStats>();
+        bool isPlayerLowHealth = playerStats.currentHealth <= playerStats.GetMaxHealthValue() * 0.3f; // 判断玩家是否处于低血量状态
+        
+        ItemData_Equipment currentArmor = GetEquipment(EquipmentType.Armor);
+        
+        if (isPlayerLowHealth)
+        {
+            if (Time.time - lastTimeUsedArmor >= currentArmor.itemCooldown)
+            {
+                lastTimeUsedArmor = Time.time; // 更新上次使用时间
+                return true;
+            }
+            else
+            {
+                Debug.Log($"[{gameObject.name}] [{this.GetInstanceID()}] Armor is on cooldown. Please wait.");
+            }
+        }
+        else
+        {
+            Debug.Log($"[{gameObject.name}] [{this.GetInstanceID()}] player is not low on health.");
+        }
+        return false;
+    }
 }

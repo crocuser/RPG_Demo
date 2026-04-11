@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class CharacterStats : MonoBehaviour
@@ -78,7 +79,24 @@ public class CharacterStats : MonoBehaviour
             ApplyIgniteDamage();
     }
 
+    public virtual void IncreaseStatBy(int _modifier, float _duration, Stat _statToModify)
+    {
+        // _modifier 是增益的数值，比如增加10点力量
+        // _duration 是增益持续的时间，比如10秒
+        // _statToModify 是要被修改的属性，比如力量、敏捷等
 
+        // 施加增益，持续一段时间后移除增益，使用协程来处理增益持续时间
+        StartCoroutine(StatModCoroutine(_modifier, _duration, _statToModify));
+    }
+
+    private IEnumerator StatModCoroutine(int _modifier, float _duration, Stat _statToModify)
+    {
+        _statToModify.AddModifier(_modifier);
+        
+        yield return new WaitForSeconds(_duration);
+
+        _statToModify.RemoveModifier(_modifier);
+    }
     public virtual void DoDamage(CharacterStats _targetStats)
     {
         if (TargetCanAvoidAttack(_targetStats)) // 目标闪避成功
@@ -86,7 +104,7 @@ public class CharacterStats : MonoBehaviour
 
         DoPhysicalDamage(_targetStats);
 
-        //DoMagicDamage(_targetStats);
+        DoMagicDamage(_targetStats); // 主武器造成伤害后，可附加一次魔法伤害和状态效果
 
     }
 
@@ -116,7 +134,7 @@ public class CharacterStats : MonoBehaviour
 
         totalMagicDamage = CheckTargetResistance(_targetStats, totalMagicDamage);
 
-        Debug.Log("魔法伤害：" + totalMagicDamage);
+        //Debug.Log("魔法伤害：" + totalMagicDamage);
         _targetStats.TakeDamage(totalMagicDamage);
 
 
@@ -282,6 +300,9 @@ public class CharacterStats : MonoBehaviour
     #endregion
     public virtual void TakeDamage(int _damage)
     {
+        if (_damage == 0)
+            return;
+
         // 从敌人的角度，受到伤害
         DecreaseHealthBy(_damage);
 
@@ -294,6 +315,15 @@ public class CharacterStats : MonoBehaviour
         }
     }
 
+    public virtual void IncreaseHealthBy(int _amount)
+    {
+        currentHealth += _amount;
+
+        if (currentHealth > GetMaxHealthValue())
+            currentHealth = GetMaxHealthValue();
+
+        onHealthChanged?.Invoke();
+    }
     protected virtual void DecreaseHealthBy(int _damage)
     {
         currentHealth -= _damage;

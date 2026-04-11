@@ -134,7 +134,7 @@ public class Sword_Skill_Controller : MonoBehaviour
             {
                 spinTimer -= Time.deltaTime;
 
-                transform.position = Vector2.MoveTowards(transform.position, new Vector2(transform.position.x + spinDirection, transform.position.y), 1.5f * Time.deltaTime); // 旋转时，剑沿着水平方向移动
+                //transform.position = Vector2.MoveTowards(transform.position, new Vector2(transform.position.x + spinDirection, transform.position.y), 1.5f * Time.deltaTime); // 旋转时，剑沿着水平方向移动
 
                 if (spinTimer <= 0)
                 {
@@ -217,6 +217,13 @@ public class Sword_Skill_Controller : MonoBehaviour
         //enemy.DamageImpact();
         player.stats.DoDamage(enemy.GetComponent<CharacterStats>());
         enemy.StartCoroutine("FreezeTimeFor", freezeTimeDuration);
+
+        ItemData_Equipment equipedAmult = Inventory.instance.GetEquipment(EquipmentType.Amulet);
+
+        if (equipedAmult != null)
+        {
+            equipedAmult.ExecuteItemEffect(enemy.transform); // 执行护身符的效果
+        }
     }
 
     private void SetupTargetsForBounce(Collider2D collision)

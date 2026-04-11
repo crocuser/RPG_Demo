@@ -10,13 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eb59d874c715c784d8bca4d8caf0526a, type: 3}
-  m_Name: Flask
+  m_Name: Healing flask
   m_EditorClassIdentifier: 
   itemType: 1
-  itemName: Flask
-  icon: {fileID: -2108229982, guid: a9ca9a41598dd2e44b125928045c518f, type: 3}
-  dropChance: 30
+  itemName: Healing flask
+  icon: {fileID: -1698851337, guid: a9ca9a41598dd2e44b125928045c518f, type: 3}
+  dropChance: 0
   equipmentType: 3
+  itemCooldown: 5
+  itemEffects:
+  - {fileID: 11400000, guid: 086b324f0095628469c3845c68f22cfc, type: 2}
   strength: 0
   agility: 0
   intelligence: 0

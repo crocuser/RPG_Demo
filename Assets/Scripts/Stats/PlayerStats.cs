@@ -25,4 +25,14 @@ public class PlayerStats : CharacterStats
 
         GetComponent<PlayerItemDrop>()?.GenerateDrop();
     }
+
+    protected override void DecreaseHealthBy(int _damage)
+    {
+        base.DecreaseHealthBy(_damage);
+
+        // 玩家血量减少时，执行盔甲装备的效果
+        ItemData_Equipment currentArmor = Inventory.instance.GetEquipment(EquipmentType.Armor);
+
+        currentArmor?.ExecuteItemEffect(player.transform);
+    }
 }

@@ -74,6 +74,10 @@ public class Enemy : Entity
         }
     }
 
+    public virtual void StartFreezeTimeFor(float _duration)
+    {
+        StartCoroutine(FreezeTimeFor(_duration));
+    }
     protected virtual IEnumerator FreezeTimeFor(float _seconds)
     {
         FreezeTime(true);

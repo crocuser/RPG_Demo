@@ -15,6 +15,8 @@ public class ItemData_Equipment : ItemData
 {
     public EquipmentType equipmentType;
 
+    public float itemCooldown; // 使用后冷却时间
+
     public ItemEffect[] itemEffects;
 
     // 直接复制 CharacterStats 里的属性
