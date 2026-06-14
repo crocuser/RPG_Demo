@@ -5,7 +5,7 @@ public class UI_Manager : MonoBehaviour
 {
     public static UI_Manager instance { get; private set; }
 
-    [Header("UI Panels")]
+    [Header("UI_Pages Panels")]
     [SerializeField] private GameObject inventorySlotPanel;
     [SerializeField] private GameObject stashSlotPanel;
     [SerializeField] private GameObject equipmentSlotPanel;

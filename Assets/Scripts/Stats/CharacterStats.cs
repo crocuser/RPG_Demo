@@ -1,5 +1,27 @@
 using System.Collections;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
+
+public enum statType
+{
+    strength, // 力量--暴击伤害
+    agility, // 敏捷--闪避速度
+    intelligence, // 智力--魔法伤害
+    vitality, // 体力--生命值
+
+    damage,//暴击伤害
+    critChance, // 暴击率
+    critPower, // 暴击倍率
+
+    maxHealth, // 最大生命值
+    armor, // 护甲--物理伤害减免
+    evasion, // 闪避--闪避率
+    magicResistance, // 魔抗--魔法伤害减免
+
+    fireDamage, // 火焰伤害
+    iceDamage, // 冰霜伤害
+    lightningDamage // 闪电伤害
+}
 
 public class CharacterStats : MonoBehaviour
 {
@@ -394,4 +416,27 @@ public class CharacterStats : MonoBehaviour
         return maxHealth.GetValue() + vitality.GetValue() * 5;
     }
     #endregion
+
+    public Stat GetStat(statType _statType)
+    {
+        return _statType switch
+        {
+            // switch的新写法，根据_statType的值返回对应的Stat属性统计
+            statType.strength => strength, // 在角色统计里，这个属性名就代表这个属性统计
+            statType.agility => agility,
+            statType.intelligence => intelligence,
+            statType.vitality => vitality,
+            statType.damage => damage,
+            statType.critChance => critChance,
+            statType.critPower => critPower,
+            statType.maxHealth => maxHealth,
+            statType.armor => armor,
+            statType.evasion => evasion,
+            statType.magicResistance => magicResistance,
+            statType.fireDamage => fireDamage,
+            statType.iceDamage => iceDamage,
+            statType.lightningDamage => lightningDamage,
+            _ => throw new System.ArgumentOutOfRangeException(nameof(_statType), $"无效的属性类型：{_statType}")
+        };
+    }
 }

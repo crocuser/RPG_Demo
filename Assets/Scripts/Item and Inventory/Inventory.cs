@@ -18,14 +18,16 @@ public class Inventory : MonoBehaviour
     public List<InventoryItem> stashItems; // 储藏实例列表
     public Dictionary<ItemData, InventoryItem> stashDictionary; // 储藏数据到储藏实例的映射
 
-    [Header("Inventory UI")]
+    [Header("Inventory UI_Pages")]
     [SerializeField] private Transform inventorySlotParent; // UI物品槽的父物体
     [SerializeField] private Transform stashSlotParent; // UI储藏槽的父物体
     [SerializeField] private Transform equipmentSlotParent; // UI装备槽的父物体
+    [SerializeField] private Transform statSlotParent; // 在装备的时候会改变玩家的属性槽统计，所以获取这个统计统计的父亲
 
     private UI_ItemSlot[] inventoryItemSlot; // 物品槽数组
     private UI_ItemSlot[] stashItemSlot; // 储藏槽数组
     private UI_EquipmentSlot[] equipmentSlot; // 装备槽数组
+    private UI_StatSlot[] statSlot; // 状态统计槽的数组
 
     [Header("Items cooldown")]
     private float lastTimeUsedFlask = -Mathf.Infinity; // 上次使用药水的时间，初始值为负无穷，确保第一次使用时不会受到冷却限制
@@ -54,6 +56,7 @@ public class Inventory : MonoBehaviour
         inventoryItemSlot = inventorySlotParent.GetComponentsInChildren<UI_ItemSlot>(); // 获取所有物品槽组件
         stashItemSlot = stashSlotParent.GetComponentsInChildren<UI_ItemSlot>(); // 获取所有储藏槽组件
         equipmentSlot = equipmentSlotParent.GetComponentsInChildren<UI_EquipmentSlot>(); // 获取所有装备槽组件
+        statSlot = statSlotParent.GetComponentsInChildren<UI_StatSlot>(); // 获取统计槽数组
 
         AddStartingItems();
     }
@@ -161,6 +164,12 @@ public class Inventory : MonoBehaviour
         for (int i = 0; i < stashItems.Count; i++)
         {
             stashItemSlot[i].UpdateSlot(stashItems[i]);
+        }
+
+        // 更新统计槽UI
+        for (int i = 0; i < statSlot.Length; i++)
+        {
+            statSlot[i].UpdateStatValueUI();
         }
     }
     public void AddItem(ItemData _item)
