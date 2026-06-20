@@ -9,9 +9,12 @@ public class UI_Pages : MonoBehaviour
     public Color normalColor;
     public Color selectedColor;
 
+    public UI_ItemTooltip itemTooltip;
+    public UI_StatTooltip statTooltip;
+
     void Start()
     {
-        
+
     }
 
     void Update()

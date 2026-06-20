@@ -4,7 +4,7 @@ using UnityEngine;
 public class Buff_Effect : ItemEffect
 {
     private PlayerStats stats;
-    [SerializeField] private statType buffType; // 增加属性的类型
+    [SerializeField] private StatType buffType; // 增加属性的类型
     [SerializeField] private int buffAmount; // 增加的属性值
     [SerializeField] private float buffDuration; // 增加属性的持续时间
 

@@ -45,6 +45,9 @@ public class ItemData_Equipment : ItemData
     [Header("Craft requirements")]
     public List<InventoryItem> craftingMaterials; // 合成材料
 
+    // 描述默认长度
+    private int defaultDescriptionLength;
+
     public void ExecuteItemEffect(Transform _enemyPosiition)
     {
         foreach (ItemEffect effect in itemEffects)
@@ -98,5 +101,49 @@ public class ItemData_Equipment : ItemData
         playerStats.iceDamage.RemoveModifier(iceDamage);
         playerStats.lightningDamage.RemoveModifier(lightningDamage);
 
+    }
+
+    public override string GetDescription()
+    {
+        sb.Clear(); // 清空 StringBuilder，底层：this.Length = 0;
+        defaultDescriptionLength = 0;
+
+        AddItemDescription(strength, "strength");
+        AddItemDescription(agility, "agility");
+        AddItemDescription(intelligence, "intelligence");
+        AddItemDescription(vitality, "vitality");
+
+        AddItemDescription(damage, "damage");
+        AddItemDescription(critChance, "crit chance");
+        AddItemDescription(critPower, "crit power");
+
+        AddItemDescription(maxHealth, "max health");
+        AddItemDescription(armor, "armor");
+        AddItemDescription(evasion, "evasion");
+        AddItemDescription(magicResistance, "magic resistance");
+
+        AddItemDescription(fireDamage, "fire damage");
+        AddItemDescription(iceDamage, "ice damage");
+        AddItemDescription(lightningDamage, "lightning damage");
+
+        if (defaultDescriptionLength < 5)
+        {
+            for (int i = 0; i < 5 - defaultDescriptionLength; i++)
+            {
+                sb.AppendLine("<color=#00000000>_</color>"); // 透明字符占位
+                sb.Append(" ");
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    private void AddItemDescription(int _value, string _name)
+    {
+        if (_value != 0)
+        {
+            sb.AppendLine($"+ {_name}: {_value}");
+            defaultDescriptionLength++;
+        }
     }
 }

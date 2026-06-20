@@ -2,7 +2,7 @@ using System.Collections;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
-public enum statType
+public enum StatType
 {
     strength, // 力量--暴击伤害
     agility, // 敏捷--闪避速度
@@ -28,10 +28,10 @@ public class CharacterStats : MonoBehaviour
     private EnityFX fx;
 
     [Header("Major stats")]
-    public Stat strength; // 力量--暴击伤害
-    public Stat agility; // 敏捷--闪避速度
-    public Stat intelligence; // 智力--魔法伤害
-    public Stat vitality; // 体力--生命值
+    public Stat strength; // 力量--暴击伤害：增加基础伤害和暴击倍率
+    public Stat agility; // 敏捷--闪避速度：增加闪避率和暴击率
+    public Stat intelligence; // 智力--魔法伤害：增加基础魔法伤害和魔抗
+    public Stat vitality; // 体力--生命值：增加最大生命值
 
     [Header("Offensive stats")]
     public Stat damage;
@@ -151,8 +151,9 @@ public class CharacterStats : MonoBehaviour
         int _fireDamage = fireDamage.GetValue();
         int _iceDamage = iceDamage.GetValue();
         int _lightningDamage = lightningDamage.GetValue();
+        int maxDamage = Mathf.Max(_fireDamage, _iceDamage, _lightningDamage);
 
-        int totalMagicDamage = _fireDamage + _iceDamage + _lightningDamage + intelligence.GetValue(); // 智力增基础魔法伤害（数值）
+        int totalMagicDamage = maxDamage + intelligence.GetValue(); // 智力增基础魔法伤害（数值）
 
         totalMagicDamage = CheckTargetResistance(_targetStats, totalMagicDamage);
 
@@ -160,7 +161,7 @@ public class CharacterStats : MonoBehaviour
         _targetStats.TakeDamage(totalMagicDamage);
 
 
-        if (Mathf.Max(_fireDamage, _iceDamage, _lightningDamage) <= 0)
+        if (maxDamage <= 0)
             return; // 如果没有任何魔法伤害，就不施加状态
 
         bool flowControl = AttemptToApplyAilement(_targetStats, _fireDamage, _iceDamage, _lightningDamage);
@@ -417,25 +418,25 @@ public class CharacterStats : MonoBehaviour
     }
     #endregion
 
-    public Stat GetStat(statType _statType)
+    public Stat GetStat(StatType _statType)
     {
         return _statType switch
         {
             // switch的新写法，根据_statType的值返回对应的Stat属性统计
-            statType.strength => strength, // 在角色统计里，这个属性名就代表这个属性统计
-            statType.agility => agility,
-            statType.intelligence => intelligence,
-            statType.vitality => vitality,
-            statType.damage => damage,
-            statType.critChance => critChance,
-            statType.critPower => critPower,
-            statType.maxHealth => maxHealth,
-            statType.armor => armor,
-            statType.evasion => evasion,
-            statType.magicResistance => magicResistance,
-            statType.fireDamage => fireDamage,
-            statType.iceDamage => iceDamage,
-            statType.lightningDamage => lightningDamage,
+            StatType.strength => strength, // 在角色统计里，这个属性名就代表这个属性统计
+            StatType.agility => agility,
+            StatType.intelligence => intelligence,
+            StatType.vitality => vitality,
+            StatType.damage => damage,
+            StatType.critChance => critChance,
+            StatType.critPower => critPower,
+            StatType.maxHealth => maxHealth,
+            StatType.armor => armor,
+            StatType.evasion => evasion,
+            StatType.magicResistance => magicResistance,
+            StatType.fireDamage => fireDamage,
+            StatType.iceDamage => iceDamage,
+            StatType.lightningDamage => lightningDamage,
             _ => throw new System.ArgumentOutOfRangeException(nameof(_statType), $"无效的属性类型：{_statType}")
         };
     }
